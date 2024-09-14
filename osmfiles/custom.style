@@ -1,0 +1,49 @@
+# OsmType  Tag                  DataType     Flags
+
+node,way   name                 text         polygon
+node,way   amenity              text         polygon
+node,way   shop                 text         polygon
+node,way   public_transport     text         polygon
+node,way   railway              text         linear
+node,way   leisure              text         polygon
+node,way   natural              text         polygon
+node,way   waterway             text         linear
+node,way   landuse              text         polygon
+node,way   power                text         polygon
+node,way   man_made             text         polygon
+node,way   highway              text         linear
+
+# Столбцы для специальных случаев, таких как z_order и way_area
+node,way   z_order              int4         linear
+way        way_area             real         linear
+
+# Удаление лишних тегов от мапперов и для внутренних целей
+node,way   note                 text         delete
+node,way   note:*               text         delete
+node,way   source               text         delete
+node,way   source_ref           text         delete
+node,way   source:*             text         delete
+node,way   attribution          text         delete
+node,way   comment              text         delete
+node,way   fixme                text         delete
+node,way   created_by           text         delete
+node,way   odbl                 text         delete
+node,way   odbl:note            text         delete
+node,way   SK53_bulk:load       text         delete
+
+# Удаление импортных тегов, которые обычно не нужны
+node,way   tiger:*              text         delete
+node,way   NHD:*                text         delete
+node,way   nhd:*                text         delete
+node,way   gnis:*               text         delete
+node,way   geobase:*            text         delete
+node,way   accuracy:meters      text         delete
+node,way   sub_sea:type         text         delete
+node,way   waterway:type        text         delete
+node,way   KSJ2:*               text         delete
+node,way   yh:*                 text         delete
+node,way   osak:*               text         delete
+node,way   kms:*                text         delete
+node,way   ngbe:*               text         delete
+node,way   naptan:*             text         delete
+node,way   CLC:*                text         delete

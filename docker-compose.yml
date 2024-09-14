@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  postgis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: postgis
+    environment:
+      POSTGRES_USER: osmuser
+      POSTGRES_PASSWORD: osmpassword
+      POSTGRES_DB: osm
+    volumes:
+      - osm-db-data:/var/lib/postgresql/data
+      - ./osmfiles:/osmfiles
+      - ./scripts:/scripts
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  osm-db-data:
+    driver: local
