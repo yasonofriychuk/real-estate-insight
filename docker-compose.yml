@@ -11,8 +11,6 @@ services:
       POSTGRES_DB: osm
     volumes:
       - osm-db-data:/var/lib/postgresql/data
-      - ./osmfiles:/osmfiles
-      - ./scripts:/scripts
     ports:
       - "5432:5432"
     restart: unless-stopped

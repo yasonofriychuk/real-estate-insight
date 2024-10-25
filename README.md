@@ -12,7 +12,7 @@ docker-compose up --build -d
 docker-compose down -v
 ```
 
-Импорт osm в базу данных
+Форматирование/линтеры
 ```shell
-docker-compose exec postgis bash -c "/usr/local/bin/import_osm.sh"
+golangci-lint run --fix
 ```
