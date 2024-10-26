@@ -10,7 +10,7 @@ import (
 	"github.com/paulmach/orb"
 
 	"github.com/yasonofriychuk/real-estate-insight/interanal/infrastructure/logger"
-	"github.com/yasonofriychuk/real-estate-insight/interanal/route_builder"
+	"github.com/yasonofriychuk/real-estate-insight/interanal/osm/route_builder"
 )
 
 func main() {
