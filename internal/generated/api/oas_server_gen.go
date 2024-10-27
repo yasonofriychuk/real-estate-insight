@@ -10,10 +10,16 @@ import (
 type Handler interface {
 	// BuildRoutesByPoints implements buildRoutesByPoints operation.
 	//
-	// Build routes to infrastructure facilities.
+	// Build a route between points.
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
+	//
+	// Search for nearby infrastructure facilities.
+	//
+	// GET /objects/find/nearestInfrastructure
+	ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (ObjectsFindNearestInfrastructureRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

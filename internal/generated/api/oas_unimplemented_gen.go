@@ -15,9 +15,18 @@ var _ Handler = UnimplementedHandler{}
 
 // BuildRoutesByPoints implements buildRoutesByPoints operation.
 //
-// Build routes to infrastructure facilities.
+// Build a route between points.
 //
 // GET /routes/build/points
 func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (r BuildRoutesByPointsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
+//
+// Search for nearby infrastructure facilities.
+//
+// GET /objects/find/nearestInfrastructure
+func (UnimplementedHandler) ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (r ObjectsFindNearestInfrastructureRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

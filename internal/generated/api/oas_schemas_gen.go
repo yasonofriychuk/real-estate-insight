@@ -138,6 +138,89 @@ func (s *ErrorStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type ObjectsFindNearestInfrastructureBadRequest Error
+
+func (*ObjectsFindNearestInfrastructureBadRequest) objectsFindNearestInfrastructureRes() {}
+
+type ObjectsFindNearestInfrastructureInternalServerError Error
+
+func (*ObjectsFindNearestInfrastructureInternalServerError) objectsFindNearestInfrastructureRes() {}
+
+type ObjectsFindNearestInfrastructureOK map[string]jx.Raw
+
+func (s *ObjectsFindNearestInfrastructureOK) init() ObjectsFindNearestInfrastructureOK {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+func (*ObjectsFindNearestInfrastructureOK) objectsFindNearestInfrastructureRes() {}
+
+type ObjectsFindNearestInfrastructureObjectTypesItem string
+
+const (
+	ObjectsFindNearestInfrastructureObjectTypesItemHospital     ObjectsFindNearestInfrastructureObjectTypesItem = "hospital"
+	ObjectsFindNearestInfrastructureObjectTypesItemSport        ObjectsFindNearestInfrastructureObjectTypesItem = "sport"
+	ObjectsFindNearestInfrastructureObjectTypesItemShops        ObjectsFindNearestInfrastructureObjectTypesItem = "shops"
+	ObjectsFindNearestInfrastructureObjectTypesItemKindergarten ObjectsFindNearestInfrastructureObjectTypesItem = "kindergarten"
+	ObjectsFindNearestInfrastructureObjectTypesItemBusStop      ObjectsFindNearestInfrastructureObjectTypesItem = "busStop"
+)
+
+// AllValues returns all ObjectsFindNearestInfrastructureObjectTypesItem values.
+func (ObjectsFindNearestInfrastructureObjectTypesItem) AllValues() []ObjectsFindNearestInfrastructureObjectTypesItem {
+	return []ObjectsFindNearestInfrastructureObjectTypesItem{
+		ObjectsFindNearestInfrastructureObjectTypesItemHospital,
+		ObjectsFindNearestInfrastructureObjectTypesItemSport,
+		ObjectsFindNearestInfrastructureObjectTypesItemShops,
+		ObjectsFindNearestInfrastructureObjectTypesItemKindergarten,
+		ObjectsFindNearestInfrastructureObjectTypesItemBusStop,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ObjectsFindNearestInfrastructureObjectTypesItem) MarshalText() ([]byte, error) {
+	switch s {
+	case ObjectsFindNearestInfrastructureObjectTypesItemHospital:
+		return []byte(s), nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemSport:
+		return []byte(s), nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemShops:
+		return []byte(s), nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemKindergarten:
+		return []byte(s), nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemBusStop:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ObjectsFindNearestInfrastructureObjectTypesItem) UnmarshalText(data []byte) error {
+	switch ObjectsFindNearestInfrastructureObjectTypesItem(data) {
+	case ObjectsFindNearestInfrastructureObjectTypesItemHospital:
+		*s = ObjectsFindNearestInfrastructureObjectTypesItemHospital
+		return nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemSport:
+		*s = ObjectsFindNearestInfrastructureObjectTypesItemSport
+		return nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemShops:
+		*s = ObjectsFindNearestInfrastructureObjectTypesItemShops
+		return nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemKindergarten:
+		*s = ObjectsFindNearestInfrastructureObjectTypesItemKindergarten
+		return nil
+	case ObjectsFindNearestInfrastructureObjectTypesItemBusStop:
+		*s = ObjectsFindNearestInfrastructureObjectTypesItemBusStop
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // NewOptErrorError returns new OptErrorError with value set to v.
 func NewOptErrorError(v ErrorError) OptErrorError {
 	return OptErrorError{

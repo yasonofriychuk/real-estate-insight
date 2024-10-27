@@ -22,7 +22,7 @@ import (
 
 // handleBuildRoutesByPointsRequest handles buildRoutesByPoints operation.
 //
-// Build routes to infrastructure facilities.
+// Build a route between points.
 //
 // GET /routes/build/points
 func (s *Server) handleBuildRoutesByPointsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -84,7 +84,7 @@ func (s *Server) handleBuildRoutesByPointsRequest(args [0]string, argsEscaped bo
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "BuildRoutesByPoints",
-			OperationSummary: "Build routes to infrastructure facilities",
+			OperationSummary: "Build a route between points",
 			OperationID:      "buildRoutesByPoints",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -136,6 +136,126 @@ func (s *Server) handleBuildRoutesByPointsRequest(args [0]string, argsEscaped bo
 	}
 
 	if err := encodeBuildRoutesByPointsResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleObjectsFindNearestInfrastructureRequest handles objectsFindNearestInfrastructure operation.
+//
+// Search for nearby infrastructure facilities.
+//
+// GET /objects/find/nearestInfrastructure
+func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("objectsFindNearestInfrastructure"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/objects/find/nearestInfrastructure"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ObjectsFindNearestInfrastructure",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "ObjectsFindNearestInfrastructure",
+			ID:   "objectsFindNearestInfrastructure",
+		}
+	)
+	params, err := decodeObjectsFindNearestInfrastructureParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response ObjectsFindNearestInfrastructureRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "ObjectsFindNearestInfrastructure",
+			OperationSummary: "Search for nearby infrastructure facilities",
+			OperationID:      "objectsFindNearestInfrastructure",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "lat",
+					In:   "query",
+				}: params.Lat,
+				{
+					Name: "lon",
+					In:   "query",
+				}: params.Lon,
+				{
+					Name: "objectTypes",
+					In:   "query",
+				}: params.ObjectTypes,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = ObjectsFindNearestInfrastructureParams
+			Response = ObjectsFindNearestInfrastructureRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackObjectsFindNearestInfrastructureParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.ObjectsFindNearestInfrastructure(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.ObjectsFindNearestInfrastructure(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeObjectsFindNearestInfrastructureResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

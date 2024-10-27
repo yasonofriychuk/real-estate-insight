@@ -68,3 +68,36 @@ func (s ErrorStatus) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
+func (s *ObjectsFindNearestInfrastructureBadRequest) Validate() error {
+	alias := (*Error)(s)
+	if err := alias.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ObjectsFindNearestInfrastructureInternalServerError) Validate() error {
+	alias := (*Error)(s)
+	if err := alias.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s ObjectsFindNearestInfrastructureObjectTypesItem) Validate() error {
+	switch s {
+	case "hospital":
+		return nil
+	case "sport":
+		return nil
+	case "shops":
+		return nil
+	case "kindergarten":
+		return nil
+	case "busStop":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}

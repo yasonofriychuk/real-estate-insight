@@ -7,8 +7,8 @@ info:
 paths:
   /routes/build/points:
     get:
-      summary: Build routes to infrastructure facilities
-      description: Build routes to infrastructure facilities
+      summary: Build a route between points
+      description: Build a route between points
       operationId: buildRoutesByPoints
       parameters:
         - name: latFrom
@@ -47,6 +47,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /objects/find/nearestInfrastructure:
+    get:
+      summary: Search for nearby infrastructure facilities
+      description: Search for nearby infrastructure facilities
+      operationId: objectsFindNearestInfrastructure
+      parameters:
+        - name: lat
+          in: query
+          schema:
+            type: number
+        - name: lon
+          in: query
+          schema:
+            type: number
+        - name: objectTypes
+          in: query
+          description: 'Necessary objects'
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - hospital
+                - sport
+                - shops
+                - kindergarten
+                - busStop
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true # GeoJson
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
 components:
   schemas:
     error:

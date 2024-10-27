@@ -1,0 +1,15 @@
+@host = 127.0.0.1:8080
+@lonFrom=73.41071023568674
+@latFrom=61.239917163896365
+@latTo=61.2774852727745
+@lonTo=73.36503933069116
+
+### Построение маршрута между двумя точками
+GET {{host}}/routes/build/points?lonFrom={{lonFrom}}&latFrom={{latFrom}}&latTo={{latTo}}&lonTo={{lonTo}}
+
+###
+
+### Получение маршрутов до ближайших инфраструктурных объектов
+GET {{host}}//objects/find/nearestInfrastructure?objectTypes=hospital&objectTypes=sport&objectTypes=shops&objectTypes=kindergarten&objectTypes=busStop&lon={{lonFrom}}&lat={{latFrom}}
+
+###

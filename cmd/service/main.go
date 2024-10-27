@@ -7,9 +7,11 @@ import (
 	"os"
 
 	serviceapi "github.com/yasonofriychuk/real-estate-insight/internal/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/objects/objects_find_nearest_infrastructure"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/routes/build_routes_by_points"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
+	osm_storage "github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/osm"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/postgres"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/route_builder"
 )
@@ -25,10 +27,14 @@ func main() {
 	}
 	defer pg.Close()
 
+	osmStorage := osm_storage.New(pg.Pool)
+
 	buildRoutesByPointsHandler := build_routes_by_points.New(log, rb)
+	objectsFindNearestInfrastructureHandler := objects_find_nearest_infrastructure.New(log, osmStorage, rb)
 
 	srv := serviceapi.API{
-		BuildRoutesByPointsHandler: buildRoutesByPointsHandler,
+		BuildRoutesByPointsHandler:              buildRoutesByPointsHandler,
+		ObjectsFindNearestInfrastructureHandler: objectsFindNearestInfrastructureHandler,
 	}
 
 	server, err := api.NewServer(srv)

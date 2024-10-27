@@ -3,6 +3,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-faster/errors"
@@ -284,6 +285,227 @@ func decodeBuildRoutesByPointsParams(args [0]string, argsEscaped bool, r *http.R
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "lonTo",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// ObjectsFindNearestInfrastructureParams is parameters of objectsFindNearestInfrastructure operation.
+type ObjectsFindNearestInfrastructureParams struct {
+	Lat OptFloat64
+	Lon OptFloat64
+	// Necessary objects.
+	ObjectTypes []ObjectsFindNearestInfrastructureObjectTypesItem
+}
+
+func unpackObjectsFindNearestInfrastructureParams(packed middleware.Parameters) (params ObjectsFindNearestInfrastructureParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "lat",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Lat = v.(OptFloat64)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "lon",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Lon = v.(OptFloat64)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "objectTypes",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.ObjectTypes = v.([]ObjectsFindNearestInfrastructureObjectTypesItem)
+		}
+	}
+	return params
+}
+
+func decodeObjectsFindNearestInfrastructureParams(args [0]string, argsEscaped bool, r *http.Request) (params ObjectsFindNearestInfrastructureParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: lat.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "lat",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLatVal float64
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLatVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Lat.SetTo(paramsDotLatVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Lat.Get(); ok {
+					if err := func() error {
+						if err := (validate.Float{}).Validate(float64(value)); err != nil {
+							return errors.Wrap(err, "float")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "lat",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: lon.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "lon",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLonVal float64
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLonVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Lon.SetTo(paramsDotLonVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Lon.Get(); ok {
+					if err := func() error {
+						if err := (validate.Float{}).Validate(float64(value)); err != nil {
+							return errors.Wrap(err, "float")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "lon",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: objectTypes.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "objectTypes",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotObjectTypesVal ObjectsFindNearestInfrastructureObjectTypesItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotObjectTypesVal = ObjectsFindNearestInfrastructureObjectTypesItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.ObjectTypes = append(params.ObjectTypes, paramsDotObjectTypesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.ObjectTypes {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "objectTypes",
 			In:   "query",
 			Err:  err,
 		}

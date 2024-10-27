@@ -4,3 +4,7 @@ package api
 type BuildRoutesByPointsRes interface {
 	buildRoutesByPointsRes()
 }
+
+type ObjectsFindNearestInfrastructureRes interface {
+	objectsFindNearestInfrastructureRes()
+}

@@ -48,24 +48,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/routes/build/points"
+		case '/': // Prefix: "/"
 			origElem := elem
-			if l := len("/routes/build/points"); len(elem) >= l && elem[0:l] == "/routes/build/points" {
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				// Leaf node.
-				switch r.Method {
-				case "GET":
-					s.handleBuildRoutesByPointsRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "GET")
+				break
+			}
+			switch elem[0] {
+			case 'o': // Prefix: "objects/find/nearestInfrastructure"
+				origElem := elem
+				if l := len("objects/find/nearestInfrastructure"); len(elem) >= l && elem[0:l] == "objects/find/nearestInfrastructure" {
+					elem = elem[l:]
+				} else {
+					break
 				}
 
-				return
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleObjectsFindNearestInfrastructureRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
+			case 'r': // Prefix: "routes/build/points"
+				origElem := elem
+				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleBuildRoutesByPointsRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
 			}
 
 			elem = origElem
@@ -149,28 +185,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/routes/build/points"
+		case '/': // Prefix: "/"
 			origElem := elem
-			if l := len("/routes/build/points"); len(elem) >= l && elem[0:l] == "/routes/build/points" {
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				// Leaf node.
-				switch method {
-				case "GET":
-					r.name = "BuildRoutesByPoints"
-					r.summary = "Build routes to infrastructure facilities"
-					r.operationID = "buildRoutesByPoints"
-					r.pathPattern = "/routes/build/points"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
+				break
+			}
+			switch elem[0] {
+			case 'o': // Prefix: "objects/find/nearestInfrastructure"
+				origElem := elem
+				if l := len("objects/find/nearestInfrastructure"); len(elem) >= l && elem[0:l] == "objects/find/nearestInfrastructure" {
+					elem = elem[l:]
+				} else {
+					break
 				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "ObjectsFindNearestInfrastructure"
+						r.summary = "Search for nearby infrastructure facilities"
+						r.operationID = "objectsFindNearestInfrastructure"
+						r.pathPattern = "/objects/find/nearestInfrastructure"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 'r': // Prefix: "routes/build/points"
+				origElem := elem
+				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "BuildRoutesByPoints"
+						r.summary = "Build a route between points"
+						r.operationID = "buildRoutesByPoints"
+						r.pathPattern = "/routes/build/points"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
 			}
 
 			elem = origElem
