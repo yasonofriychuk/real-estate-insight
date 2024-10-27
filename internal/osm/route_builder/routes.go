@@ -49,7 +49,7 @@ func (b *RouteBuilder) BuildRoute(from, to orb.Point, transportType TransportTyp
 				Coordinates [][]float64 `json:"coordinates"`
 				Type        string      `json:"type"`
 			} `json:"geometry"`
-			Duration int     `json:"duration"`
+			Duration float64 `json:"duration"`
 			Distance float64 `json:"distance"`
 		} `json:"routes"`
 	}{}

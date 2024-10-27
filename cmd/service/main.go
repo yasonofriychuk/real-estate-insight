@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 
-	geojson "github.com/paulmach/go.geojson"
-	"github.com/paulmach/orb"
-
-	"github.com/yasonofriychuk/real-estate-insight/interanal/infrastructure/logger"
-	"github.com/yasonofriychuk/real-estate-insight/interanal/osm/route_builder"
+	serviceapi "github.com/yasonofriychuk/real-estate-insight/internal/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/routes/build_routes_by_points"
+	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/postgres"
+	"github.com/yasonofriychuk/real-estate-insight/internal/osm/route_builder"
 )
 
 func main() {
@@ -18,33 +19,26 @@ func main() {
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
 	rb := route_builder.NewRouteBuilder()
 
-	p1 := orb.Point{73.45854604143702, 61.25336620862143}
-	p2 := orb.Point{73.34854329623607, 61.281014899219855}
+	pg, err := postgres.New("postgres://osmuser:osmpassword@localhost:5432/osm")
+	if err != nil {
+		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
+	}
+	defer pg.Close()
 
-	featureCollection := geojson.NewFeatureCollection()
+	buildRoutesByPointsHandler := build_routes_by_points.New(log, rb)
 
-	for _, t := range route_builder.TransportTypes[:1] {
-		routes, err := rb.BuildRoute(p1, p2, t)
-		if err != nil {
-			log.WithContext(ctx).WithError(err).Error("failed to build route")
-			os.Exit(1)
-		}
-
-		for _, route := range routes {
-			feature := geojson.NewLineStringFeature(route.Coordinates)
-
-			feature.SetProperty("duration", fmt.Sprintf("%.2f minutes", float64(route.Duration)/60.0))
-			feature.SetProperty("distance", fmt.Sprintf("%.2f meters", route.Distance))
-
-			featureCollection.AddFeature(feature)
-		}
+	srv := serviceapi.API{
+		BuildRoutesByPointsHandler: buildRoutesByPointsHandler,
 	}
 
-	b, err := featureCollection.MarshalJSON()
+	server, err := api.NewServer(srv)
 	if err != nil {
-		log.WithContext(ctx).WithError(err).Error("failed to marshal featureCollection")
+		log.WithContext(ctx).WithError(err).Error("failed to create server")
 		os.Exit(1)
 	}
 
-	fmt.Println(string(b))
+	if err := http.ListenAndServe(":8080", server); err != nil {
+		log.WithContext(ctx).WithError(err).Error("failed to start server")
+		os.Exit(1)
+	}
 }

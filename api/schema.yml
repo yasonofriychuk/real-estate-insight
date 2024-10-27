@@ -1,0 +1,71 @@
+openapi: 3.0.3
+servers:
+  - url: 'https://127.0.0.1:8080'
+info:
+  version: 1.0.0
+  title: Real estate insight
+paths:
+  /routes/build/points:
+    get:
+      summary: Build routes to infrastructure facilities
+      description: Build routes to infrastructure facilities
+      operationId: buildRoutesByPoints
+      parameters:
+        - name: latFrom
+          in: query
+          schema:
+            type: number
+        - name: lonFrom
+          in: query
+          schema:
+            type: number
+        - name: latTo
+          in: query
+          schema:
+            type: number
+        - name: lonTo
+          in: query
+          schema:
+            type: number
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true # GeoJson
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+components:
+  schemas:
+    error:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - not-found
+            - bad-request
+            - internal-error
+            - unauthorized
+        error:
+          description: Ошибка
+          type: object
+          properties:
+            code:
+              description: Код ошибки
+              type: integer
+            message:
+              description: Сообщение об ошибке
+              type: string

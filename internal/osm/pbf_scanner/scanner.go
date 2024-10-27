@@ -18,6 +18,7 @@ var (
 		"railway":          {}, // Метро
 	}
 
+	//nolint: unused
 	tagsMap = map[string]struct{}{
 		// Образование
 		"amenity=school":       {}, // Школы

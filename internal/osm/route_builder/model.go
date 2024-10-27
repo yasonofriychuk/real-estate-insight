@@ -30,6 +30,6 @@ func (t TransportType) Valid() error {
 
 type Route struct {
 	Coordinates [][]float64
-	Duration    int
+	Duration    float64
 	Distance    float64
 }
