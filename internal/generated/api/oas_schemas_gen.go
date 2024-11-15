@@ -3,6 +3,8 @@
 package api
 
 import (
+	"io"
+
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 )
@@ -54,6 +56,8 @@ func (s *Error) SetStatus(val OptErrorStatus) {
 func (s *Error) SetError(val OptErrorError) {
 	s.Error = val
 }
+
+func (*Error) indexPageRes() {}
 
 // Ошибка.
 type ErrorError struct {
@@ -137,6 +141,22 @@ func (s *ErrorStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
+
+type IndexPageOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s IndexPageOK) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
+	return s.Data.Read(p)
+}
+
+func (*IndexPageOK) indexPageRes() {}
 
 type ObjectsFindNearestInfrastructureBadRequest Error
 

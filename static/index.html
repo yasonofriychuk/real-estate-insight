@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Geocoder с отображением объектов</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 10px;
+        }
+        .checkbox-button {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .checkbox-button.selected { /* Выбранный чекбокс */
+            outline: 3px solid #000;
+        }
+        .checkbox-button.hospital { background-color: #4CAF50; }
+        .checkbox-button.sport { background-color: #FF5722; }
+        .checkbox-button.shops { background-color: #FFC107; color: black; }
+        .checkbox-button.kindergarten { background-color: #FFEB3B; color: black; }
+        .checkbox-button.busStop { background-color: #2196F3; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="controls">
+    <label class="checkbox-button hospital">
+        <input type="checkbox" value="hospital"> Больницы
+    </label>
+    <label class="checkbox-button sport">
+        <input type="checkbox" value="sport"> Спорт
+    </label>
+    <label class="checkbox-button shops">
+        <input type="checkbox" value="shops"> Магазины
+    </label>
+    <label class="checkbox-button kindergarten">
+        <input type="checkbox" value="kindergarten"> Детские сады
+    </label>
+    <label class="checkbox-button busStop">
+        <input type="checkbox" value="busStop"> Остановки
+    </label>
+</div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css" type="text/css">
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3ZjLW9rdGEtbWFwYm94LXN0YWZmLWFjY2VzcyIsImEiOiJjbG5sMnExa3kxNTJtMmtsODJld24yNGJlIn0.RQ4CHchAYPJQZSiUJ0O3VQ';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-79.4512, 43.6568],
+        zoom: 13
+    });
+
+    // Добавляем геокодер на карту
+    const geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+    });
+    map.addControl(geocoder);
+
+    // Добавляем обработчик для кнопок-чекбоксов, чтобы изменять их состояние при выборе
+    document.querySelectorAll('.checkbox-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const checkbox = event.currentTarget.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            event.currentTarget.classList.toggle('selected', checkbox.checked);
+        });
+    });
+
+    // Функция для получения выбранных типов объектов
+    function getSelectedObjectTypes() {
+        const selectedTypes = [];
+        document.querySelectorAll('#controls input[type="checkbox"]:checked').forEach((checkbox) => {
+            selectedTypes.push(`objectTypes=${checkbox.value}`);
+        });
+        return selectedTypes.join('&');
+    }
+
+    // Функция для добавления GeoJSON данных на карту
+    function addGeoJsonToMap(data) {
+        if (map.getSource('nearestObjects')) {
+            map.getSource('nearestObjects').setData(data);
+        } else {
+            map.addSource('nearestObjects', {
+                type: 'geojson',
+                data: data
+            });
+
+            // Слой для точек
+            map.addLayer({
+                id: 'nearestObjects-points',
+                type: 'circle',
+                source: 'nearestObjects',
+                filter: ['==', '$type', 'Point'],
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': ['get', 'marker-color'],
+                    'circle-stroke-width': 1,
+                    'circle-stroke-color': '#000000'
+                }
+            });
+
+            // Слой для маршрутов
+            map.addLayer({
+                id: 'nearestObjects-lines',
+                type: 'line',
+                source: 'nearestObjects',
+                filter: ['==', '$type', 'LineString'],
+                paint: {
+                    'line-color': ['get', 'stroke'],
+                    'line-width': ['get', 'stroke-width']
+                }
+            });
+        }
+    }
+
+    // Обработчик события выбора места в геокодере
+    geocoder.on('result', (e) => {
+        const lon = e.result.center[0];
+        const lat = e.result.center[1];
+        const selectedObjectTypes = getSelectedObjectTypes();
+
+        if (selectedObjectTypes) {
+            const url = `/objects/find/nearestInfrastructure?${selectedObjectTypes}&lon=${lon}&lat=${lat}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Результаты поиска:", data);
+                    // Добавляем GeoJSON данные на карту
+                    addGeoJsonToMap(data);
+                })
+                .catch(error => console.error("Ошибка при запросе:", error));
+        } else {
+            console.warn("Выберите хотя бы один тип объекта.");
+        }
+    });
+</script>
+
+</body>
+</html>

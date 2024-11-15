@@ -14,6 +14,10 @@ type Handler interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// IndexPage implements indexPage operation.
+	//
+	// GET /
+	IndexPage(ctx context.Context) (IndexPageRes, error)
 	// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
 	//
 	// Search for nearby infrastructure facilities.

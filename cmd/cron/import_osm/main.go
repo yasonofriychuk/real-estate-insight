@@ -19,7 +19,7 @@ import (
 const (
 	batchSize = 10000
 	filePath  = "osmfiles/RU.osm.pbf"
-	pgConnStr = "postgres://osmuser:osmpassword@localhost:5432/osm"
+	pgConnStr = "postgres://postgres:password@postgres:5432/postgres"
 )
 
 func main() {

@@ -1,20 +1,45 @@
 version: '3.8'
+
 services:
-  postgis:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: postgis
-    environment:
-      POSTGRES_USER: osmuser
-      POSTGRES_PASSWORD: osmpassword
-      POSTGRES_DB: osm
+  postgres:
+    image: postgis/postgis:latest
+    platform: linux/amd64
+    env_file:
+      - .env
     volumes:
       - osm-db-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  app:
+    container_name: app
+    build: .
+    volumes:
+      - ./osmfiles:/app/osmfiles
+      - ./static:/app/static
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_network
     restart: unless-stopped
 
 volumes:
   osm-db-data:
     driver: local
+
+networks:
+  app_network:
+    driver: bridge

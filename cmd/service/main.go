@@ -7,6 +7,7 @@ import (
 	"os"
 
 	serviceapi "github.com/yasonofriychuk/real-estate-insight/internal/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/html/index_page_handler"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/objects/objects_find_nearest_infrastructure"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/routes/build_routes_by_points"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
@@ -21,7 +22,7 @@ func main() {
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
 	rb := route_builder.NewRouteBuilder()
 
-	pg, err := postgres.New("postgres://osmuser:osmpassword@localhost:5432/osm")
+	pg, err := postgres.New("postgres://postgres:password@postgres:5432/postgres")
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
 	}
@@ -29,12 +30,10 @@ func main() {
 
 	osmStorage := osm_storage.New(pg.Pool)
 
-	buildRoutesByPointsHandler := build_routes_by_points.New(log, rb)
-	objectsFindNearestInfrastructureHandler := objects_find_nearest_infrastructure.New(log, osmStorage, rb)
-
 	srv := serviceapi.API{
-		BuildRoutesByPointsHandler:              buildRoutesByPointsHandler,
-		ObjectsFindNearestInfrastructureHandler: objectsFindNearestInfrastructureHandler,
+		BuildRoutesByPointsHandler:              build_routes_by_points.New(log, rb),
+		ObjectsFindNearestInfrastructureHandler: objects_find_nearest_infrastructure.New(log, osmStorage, rb),
+		IndexPageHandler:                        index_page_handler.New(log),
 	}
 
 	server, err := api.NewServer(srv)

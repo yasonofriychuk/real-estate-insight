@@ -29,6 +29,10 @@ type Invoker interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// IndexPage invokes indexPage operation.
+	//
+	// GET /
+	IndexPage(ctx context.Context) (IndexPageRes, error)
 	// ObjectsFindNearestInfrastructure invokes objectsFindNearestInfrastructure operation.
 	//
 	// Search for nearby infrastructure facilities.
@@ -222,6 +226,76 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 
 	stage = "DecodeResponse"
 	result, err := decodeBuildRoutesByPointsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// IndexPage invokes indexPage operation.
+//
+// GET /
+func (c *Client) IndexPage(ctx context.Context) (IndexPageRes, error) {
+	res, err := c.sendIndexPage(ctx)
+	return res, err
+}
+
+func (c *Client) sendIndexPage(ctx context.Context) (res IndexPageRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("indexPage"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "IndexPage",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeIndexPageResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

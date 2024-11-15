@@ -10,6 +10,6 @@ GET {{host}}/routes/build/points?lonFrom={{lonFrom}}&latFrom={{latFrom}}&latTo={
 ###
 
 ### Получение маршрутов до ближайших инфраструктурных объектов
-GET {{host}}//objects/find/nearestInfrastructure?objectTypes=hospital&objectTypes=sport&objectTypes=shops&objectTypes=kindergarten&objectTypes=busStop&lon={{lonFrom}}&lat={{latFrom}}
+GET {{host}}/objects/find/nearestInfrastructure?objectTypes=hospital&objectTypes=sport&objectTypes=shops&objectTypes=kindergarten&objectTypes=busStop&lon={{lonFrom}}&lat={{latFrom}}
 
 ###
