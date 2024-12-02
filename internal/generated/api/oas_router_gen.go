@@ -57,14 +57,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "GET":
-					s.handleIndexPageRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "GET")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
 			case 'o': // Prefix: "objects/find/nearestInfrastructure"
@@ -201,18 +194,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "GET":
-					r.name = "IndexPage"
-					r.summary = ""
-					r.operationID = "indexPage"
-					r.pathPattern = "/"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
 			case 'o': // Prefix: "objects/find/nearestInfrastructure"
@@ -227,7 +209,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "GET":
-						r.name = "ObjectsFindNearestInfrastructure"
+						r.name = ObjectsFindNearestInfrastructureOperation
 						r.summary = "Search for nearby infrastructure facilities"
 						r.operationID = "objectsFindNearestInfrastructure"
 						r.pathPattern = "/objects/find/nearestInfrastructure"
@@ -252,7 +234,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "GET":
-						r.name = "BuildRoutesByPoints"
+						r.name = BuildRoutesByPointsOperation
 						r.summary = "Build a route between points"
 						r.operationID = "buildRoutesByPoints"
 						r.pathPattern = "/routes/build/points"

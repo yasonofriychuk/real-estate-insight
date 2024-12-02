@@ -7,7 +7,6 @@ import (
 	"os"
 
 	serviceapi "github.com/yasonofriychuk/real-estate-insight/internal/api"
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/html/index_page_handler"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/objects/objects_find_nearest_infrastructure"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/routes/build_routes_by_points"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
@@ -22,7 +21,7 @@ func main() {
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
 	rb := route_builder.NewRouteBuilder()
 
-	pg, err := postgres.New("postgres://postgres:password@postgres:5432/postgres")
+	pg, err := postgres.New("postgres://postgres:password@localhost:5432/postgres")
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
 	}
@@ -33,7 +32,6 @@ func main() {
 	srv := serviceapi.API{
 		BuildRoutesByPointsHandler:              build_routes_by_points.New(log, rb),
 		ObjectsFindNearestInfrastructureHandler: objects_find_nearest_infrastructure.New(log, osmStorage, rb),
-		IndexPageHandler:                        index_page_handler.New(log),
 	}
 
 	server, err := api.NewServer(srv)
@@ -42,7 +40,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := http.ListenAndServe(":8080", server); err != nil {
+	mux := http.NewServeMux()
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", server))
+	mux.Handle("/", http.FileServer(http.Dir("static")))
+
+	if err := http.ListenAndServe(":5001", mux); err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to start server")
 		os.Exit(1)
 	}

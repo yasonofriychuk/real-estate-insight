@@ -22,13 +22,6 @@ func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params Buil
 	return r, ht.ErrNotImplemented
 }
 
-// IndexPage implements indexPage operation.
-//
-// GET /
-func (UnimplementedHandler) IndexPage(ctx context.Context) (r IndexPageRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
 //
 // Search for nearby infrastructure facilities.
