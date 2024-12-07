@@ -10,7 +10,7 @@ services:
       - osm-db-data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - app_network
     restart: unless-stopped

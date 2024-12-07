@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,8 +22,9 @@ func main() {
 	ctx := context.Background()
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
 	rb := route_builder.NewRouteBuilder()
+	cfg := config.MustNewConfigWithEnv()
 
-	pg, err := postgres.New("postgres://postgres:password@localhost:5432/postgres")
+	pg, err := postgres.New(cfg.PgUrl())
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
 	}
@@ -44,7 +47,7 @@ func main() {
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", server))
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 
-	if err := http.ListenAndServe(":5001", mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.HttpPort()), mux); err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to start server")
 		os.Exit(1)
 	}

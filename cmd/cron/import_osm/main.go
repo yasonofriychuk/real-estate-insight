@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"log/slog"
 	"os"
-	"runtime"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -17,14 +17,15 @@ import (
 )
 
 const (
-	batchSize = 10000
-	filePath  = "osmfiles/RU.osm.pbf"
-	pgConnStr = "postgres://postgres:password@postgres:5432/postgres"
+	batchSize       = 10000
+	goroutinesCount = 2
+	filePath        = "osmfiles/RU.osm.pbf"
 )
 
 func main() {
 	ctx := context.Background()
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
+	cfg := config.MustNewConfigWithEnv()
 
 	// Инициализация компонентов
 	file, err := os.Open(filePath)
@@ -34,20 +35,21 @@ func main() {
 	}
 	defer file.Close()
 
-	pg, err := postgres.New(pgConnStr)
+	pg, err := postgres.New(cfg.PgUrl())
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
 		os.Exit(1)
 	}
 	defer pg.Close()
 
-	sc, err := pbf_scanner.New(file, runtime.GOMAXPROCS(-1))
+	sc, err := pbf_scanner.New(file, goroutinesCount)
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to initialize pbf scanner")
 		os.Exit(1)
 	}
 
 	// Накопление узлов для батча
+	var totalImport uint64
 	nodesBatch := make([]osmpbf.Node, 0, batchSize)
 	for {
 		node, err := sc.Next()
@@ -61,7 +63,12 @@ func main() {
 				log.WithContext(ctx).WithError(err).Warning("failed to insert nodes")
 				continue
 			}
+			totalImport += uint64(len(nodesBatch))
 			nodesBatch = nodesBatch[:0]
+
+			log.WithContext(ctx).WithFields(map[string]any{
+				"counts": totalImport,
+			}).Info("imported nodes")
 		}
 	}
 
