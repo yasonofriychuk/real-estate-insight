@@ -28,6 +28,79 @@ func (s *BuildRoutesByPointsOK) init() BuildRoutesByPointsOK {
 
 func (*BuildRoutesByPointsOK) buildRoutesByPointsRes() {}
 
+type DevelopmentSearchBoardBadRequest Error
+
+func (*DevelopmentSearchBoardBadRequest) developmentSearchBoardRes() {}
+
+type DevelopmentSearchBoardInternalServerError Error
+
+func (*DevelopmentSearchBoardInternalServerError) developmentSearchBoardRes() {}
+
+type DevelopmentSearchBoardOKApplicationJSON []DevelopmentSearchBoardOKItem
+
+func (*DevelopmentSearchBoardOKApplicationJSON) developmentSearchBoardRes() {}
+
+type DevelopmentSearchBoardOKItem struct {
+	ID     int                                   `json:"id"`
+	Name   string                                `json:"name"`
+	Coords OptDevelopmentSearchBoardOKItemCoords `json:"coords"`
+}
+
+// GetID returns the value of ID.
+func (s *DevelopmentSearchBoardOKItem) GetID() int {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *DevelopmentSearchBoardOKItem) GetName() string {
+	return s.Name
+}
+
+// GetCoords returns the value of Coords.
+func (s *DevelopmentSearchBoardOKItem) GetCoords() OptDevelopmentSearchBoardOKItemCoords {
+	return s.Coords
+}
+
+// SetID sets the value of ID.
+func (s *DevelopmentSearchBoardOKItem) SetID(val int) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *DevelopmentSearchBoardOKItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetCoords sets the value of Coords.
+func (s *DevelopmentSearchBoardOKItem) SetCoords(val OptDevelopmentSearchBoardOKItemCoords) {
+	s.Coords = val
+}
+
+type DevelopmentSearchBoardOKItemCoords struct {
+	Lon float64 `json:"lon"`
+	Lat float64 `json:"lat"`
+}
+
+// GetLon returns the value of Lon.
+func (s *DevelopmentSearchBoardOKItemCoords) GetLon() float64 {
+	return s.Lon
+}
+
+// GetLat returns the value of Lat.
+func (s *DevelopmentSearchBoardOKItemCoords) GetLat() float64 {
+	return s.Lat
+}
+
+// SetLon sets the value of Lon.
+func (s *DevelopmentSearchBoardOKItemCoords) SetLon(val float64) {
+	s.Lon = val
+}
+
+// SetLat sets the value of Lat.
+func (s *DevelopmentSearchBoardOKItemCoords) SetLat(val float64) {
+	s.Lat = val
+}
+
 // Ref: #/components/schemas/error
 type Error struct {
 	Status OptErrorStatus `json:"status"`
@@ -219,6 +292,52 @@ func (s *ObjectsFindNearestInfrastructureObjectTypesItem) UnmarshalText(data []b
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// NewOptDevelopmentSearchBoardOKItemCoords returns new OptDevelopmentSearchBoardOKItemCoords with value set to v.
+func NewOptDevelopmentSearchBoardOKItemCoords(v DevelopmentSearchBoardOKItemCoords) OptDevelopmentSearchBoardOKItemCoords {
+	return OptDevelopmentSearchBoardOKItemCoords{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDevelopmentSearchBoardOKItemCoords is optional DevelopmentSearchBoardOKItemCoords.
+type OptDevelopmentSearchBoardOKItemCoords struct {
+	Value DevelopmentSearchBoardOKItemCoords
+	Set   bool
+}
+
+// IsSet returns true if OptDevelopmentSearchBoardOKItemCoords was set.
+func (o OptDevelopmentSearchBoardOKItemCoords) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDevelopmentSearchBoardOKItemCoords) Reset() {
+	var v DevelopmentSearchBoardOKItemCoords
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDevelopmentSearchBoardOKItemCoords) SetTo(v DevelopmentSearchBoardOKItemCoords) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDevelopmentSearchBoardOKItemCoords) Get() (v DevelopmentSearchBoardOKItemCoords, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDevelopmentSearchBoardOKItemCoords) Or(d DevelopmentSearchBoardOKItemCoords) DevelopmentSearchBoardOKItemCoords {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptErrorError returns new OptErrorError with value set to v.

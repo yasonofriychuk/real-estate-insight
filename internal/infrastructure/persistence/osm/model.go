@@ -1,6 +1,8 @@
 package osm
 
-import "github.com/paulmach/orb"
+import (
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence"
+)
 
 type ObjType string
 
@@ -14,6 +16,6 @@ const (
 
 type Obj struct {
 	Name        string
-	Coordinates orb.Point
+	Coordinates persistence.Point
 	Type        ObjType
 }

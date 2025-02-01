@@ -9,8 +9,8 @@ import (
 	geojson "github.com/paulmach/go.geojson"
 	"github.com/paulmach/orb"
 
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/errors"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/errors"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/route_builder"
 )

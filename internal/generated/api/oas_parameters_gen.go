@@ -292,6 +292,227 @@ func decodeBuildRoutesByPointsParams(args [0]string, argsEscaped bool, r *http.R
 	return params, nil
 }
 
+// DevelopmentSearchBoardParams is parameters of developmentSearchBoard operation.
+type DevelopmentSearchBoardParams struct {
+	TopLeftLon     float64
+	TopLeftLat     float64
+	BottomRightLon float64
+	BottomRightLat float64
+}
+
+func unpackDevelopmentSearchBoardParams(packed middleware.Parameters) (params DevelopmentSearchBoardParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "topLeftLon",
+			In:   "query",
+		}
+		params.TopLeftLon = packed[key].(float64)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "topLeftLat",
+			In:   "query",
+		}
+		params.TopLeftLat = packed[key].(float64)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "bottomRightLon",
+			In:   "query",
+		}
+		params.BottomRightLon = packed[key].(float64)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "bottomRightLat",
+			In:   "query",
+		}
+		params.BottomRightLat = packed[key].(float64)
+	}
+	return params
+}
+
+func decodeDevelopmentSearchBoardParams(args [0]string, argsEscaped bool, r *http.Request) (params DevelopmentSearchBoardParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: topLeftLon.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "topLeftLon",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToFloat64(val)
+				if err != nil {
+					return err
+				}
+
+				params.TopLeftLon = c
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(params.TopLeftLon)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "topLeftLon",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: topLeftLat.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "topLeftLat",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToFloat64(val)
+				if err != nil {
+					return err
+				}
+
+				params.TopLeftLat = c
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(params.TopLeftLat)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "topLeftLat",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: bottomRightLon.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "bottomRightLon",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToFloat64(val)
+				if err != nil {
+					return err
+				}
+
+				params.BottomRightLon = c
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(params.BottomRightLon)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "bottomRightLon",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: bottomRightLat.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "bottomRightLat",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToFloat64(val)
+				if err != nil {
+					return err
+				}
+
+				params.BottomRightLat = c
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(params.BottomRightLat)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "bottomRightLat",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // ObjectsFindNearestInfrastructureParams is parameters of objectsFindNearestInfrastructure operation.
 type ObjectsFindNearestInfrastructureParams struct {
 	Lat OptFloat64

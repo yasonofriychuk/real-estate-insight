@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -11,6 +13,9 @@ type Config struct {
 }
 
 func MustNewConfigWithEnv() *Config {
+	if err := godotenv.Load(); err != nil {
+		panic(fmt.Errorf("error loading .env file: %s", err))
+	}
 	return &Config{
 		pgUrl:    mustGetEnv("PG_URL"),
 		httpPort: mustGetEnv("HTTP_PORT"),

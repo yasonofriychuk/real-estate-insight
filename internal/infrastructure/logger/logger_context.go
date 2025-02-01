@@ -3,6 +3,8 @@ package logger
 import (
 	"context"
 	"log/slog"
+	"runtime"
+	"time"
 )
 
 type LogCtx struct {
@@ -35,17 +37,25 @@ func (l LogCtx) WithFields(fields map[string]any) LogCtx {
 }
 
 func (l LogCtx) Debug(msg string) {
-	l.log.DebugContext(l.ctx, msg)
+	var pcs [1]uintptr
+	runtime.Callers(2, pcs[:])
+	_ = l.log.Handler().Handle(l.ctx, slog.NewRecord(time.Now(), slog.LevelDebug, msg, pcs[0]))
 }
 
 func (l LogCtx) Info(msg string) {
-	l.log.InfoContext(l.ctx, msg)
+	var pcs [1]uintptr
+	runtime.Callers(2, pcs[:])
+	_ = l.log.Handler().Handle(l.ctx, slog.NewRecord(time.Now(), slog.LevelInfo, msg, pcs[0]))
 }
 
 func (l LogCtx) Warning(msg string) {
-	l.log.WarnContext(l.ctx, msg)
+	var pcs [1]uintptr
+	runtime.Callers(2, pcs[:])
+	_ = l.log.Handler().Handle(l.ctx, slog.NewRecord(time.Now(), slog.LevelWarn, msg, pcs[0]))
 }
 
 func (l LogCtx) Error(msg string) {
-	l.log.ErrorContext(l.ctx, msg)
+	var pcs [1]uintptr
+	runtime.Callers(2, pcs[:])
+	_ = l.log.Handler().Handle(l.ctx, slog.NewRecord(time.Now(), slog.LevelError, msg, pcs[0]))
 }

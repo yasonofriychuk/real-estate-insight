@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"log/slog"
 	"os"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/qedus/osmpbf"
 
+	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/postgres"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/pbf_scanner"

@@ -5,6 +5,72 @@ info:
   version: 1.0.0
   title: Real estate insight
 paths:
+  /development/search/board:
+    get:
+      summary: Search for new buildings by map border
+      description: Search for new buildings by map border
+      operationId: developmentSearchBoard
+      parameters:
+        - name: topLeftLon
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: topLeftLat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: bottomRightLon
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: bottomRightLat
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    coords:
+                      type: object
+                      required:
+                        - lon
+                        - lat
+                      properties:
+                        lon:
+                          type: number
+                        lat:
+                          type: number
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
   /routes/build/points:
     get:
       summary: Build a route between points
@@ -36,7 +102,7 @@ paths:
                 type: object
                 additionalProperties: true # GeoJson
         400:
-          description: Bad request
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -89,7 +155,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/error"
         500:
-          description: Bad request
+          description: Internal server error
           content:
             application/json:
               schema:

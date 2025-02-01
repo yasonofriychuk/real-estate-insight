@@ -3,6 +3,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 
 	"github.com/ogen-go/ogen/validate"
@@ -20,6 +22,111 @@ func (s *BuildRoutesByPointsInternalServerError) Validate() error {
 	alias := (*Error)(s)
 	if err := alias.Validate(); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s *DevelopmentSearchBoardBadRequest) Validate() error {
+	alias := (*Error)(s)
+	if err := alias.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *DevelopmentSearchBoardInternalServerError) Validate() error {
+	alias := (*Error)(s)
+	if err := alias.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s DevelopmentSearchBoardOKApplicationJSON) Validate() error {
+	alias := ([]DevelopmentSearchBoardOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *DevelopmentSearchBoardOKItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Coords.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "coords",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *DevelopmentSearchBoardOKItemCoords) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Lon)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "lon",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Lat)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "lat",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 	return nil
 }

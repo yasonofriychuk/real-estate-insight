@@ -14,6 +14,12 @@ type Handler interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// DevelopmentSearchBoard implements developmentSearchBoard operation.
+	//
+	// Drawing the current terrain.
+	//
+	// GET /development/search/board
+	DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error)
 	// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
 	//
 	// Search for nearby infrastructure facilities.

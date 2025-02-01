@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	geojson "github.com/paulmach/go.geojson"
 	"github.com/paulmach/orb"
 )
 
@@ -37,26 +36,12 @@ func (s *Storage) GetNearestInfrastructure(ctx context.Context, point orb.Point,
 
 	objs := make([]Obj, 0, len(objTypes))
 	for rows.Next() {
-		var objectType, name, geometryData string
-		err := rows.Scan(&objectType, &name, &geometryData)
+		var obj Obj
+		err := rows.Scan(&obj.Type, &obj.Name, &obj.Coordinates)
 		if err != nil {
 			return nil, fmt.Errorf("scan row: %w", err)
 		}
-
-		geometry, err := geojson.UnmarshalGeometry([]byte(geometryData))
-		if err != nil {
-			return nil, fmt.Errorf("unmarshal geometry: %w", err)
-		}
-
-		if geometry.Type != geojson.GeometryPoint {
-			return nil, fmt.Errorf("invalid geometry type: %s", geometry.Type)
-		}
-
-		objs = append(objs, Obj{
-			Name:        name,
-			Coordinates: orb.Point(geometry.Point),
-			Type:        ObjType(objectType),
-		})
+		objs = append(objs, obj)
 	}
 
 	return objs, nil

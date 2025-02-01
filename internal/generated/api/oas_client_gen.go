@@ -21,6 +21,11 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+func trimTrailingSlashes(u *url.URL) {
+	u.Path = strings.TrimRight(u.Path, "/")
+	u.RawPath = strings.TrimRight(u.RawPath, "/")
+}
+
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
 	// BuildRoutesByPoints invokes buildRoutesByPoints operation.
@@ -29,6 +34,12 @@ type Invoker interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// DevelopmentSearchBoard invokes developmentSearchBoard operation.
+	//
+	// Drawing the current terrain.
+	//
+	// GET /development/search/board
+	DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error)
 	// ObjectsFindNearestInfrastructure invokes objectsFindNearestInfrastructure operation.
 	//
 	// Search for nearby infrastructure facilities.
@@ -46,11 +57,6 @@ type Client struct {
 var _ Handler = struct {
 	*Client
 }{}
-
-func trimTrailingSlashes(u *url.URL) {
-	u.Path = strings.TrimRight(u.Path, "/")
-	u.RawPath = strings.TrimRight(u.RawPath, "/")
-}
 
 // NewClient initializes new Client defined by OAS.
 func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
@@ -107,7 +113,7 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.
@@ -229,6 +235,138 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 	return result, nil
 }
 
+// DevelopmentSearchBoard invokes developmentSearchBoard operation.
+//
+// Drawing the current terrain.
+//
+// GET /development/search/board
+func (c *Client) DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error) {
+	res, err := c.sendDevelopmentSearchBoard(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (res DevelopmentSearchBoardRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("developmentSearchBoard"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/development/search/board"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DevelopmentSearchBoardOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/development/search/board"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "topLeftLon" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "topLeftLon",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.Float64ToString(params.TopLeftLon))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "topLeftLat" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "topLeftLat",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.Float64ToString(params.TopLeftLat))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "bottomRightLon" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "bottomRightLon",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.Float64ToString(params.BottomRightLon))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "bottomRightLat" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "bottomRightLat",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.Float64ToString(params.BottomRightLat))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDevelopmentSearchBoardResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ObjectsFindNearestInfrastructure invokes objectsFindNearestInfrastructure operation.
 //
 // Search for nearby infrastructure facilities.
@@ -251,7 +389,7 @@ func (c *Client) sendObjectsFindNearestInfrastructure(ctx context.Context, param
 	defer func() {
 		// Use floating point division here for higher precision (instead of Millisecond method).
 		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
 	}()
 
 	// Increment request counter.

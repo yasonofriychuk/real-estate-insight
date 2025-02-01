@@ -7,5 +7,6 @@ type OperationName = string
 
 const (
 	BuildRoutesByPointsOperation              OperationName = "BuildRoutesByPoints"
+	DevelopmentSearchBoardOperation           OperationName = "DevelopmentSearchBoard"
 	ObjectsFindNearestInfrastructureOperation OperationName = "ObjectsFindNearestInfrastructure"
 )

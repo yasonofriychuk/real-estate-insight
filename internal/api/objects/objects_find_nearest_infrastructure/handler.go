@@ -10,8 +10,8 @@ import (
 	geojson "github.com/paulmach/go.geojson"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/errors"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/errors"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/osm"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/route_builder"
@@ -64,7 +64,7 @@ func (h *ObjectsFindNearestInfrastructureHandler) ObjectsFindNearestInfrastructu
 		collection.AddFeature(f)
 
 		errGroup.Go(func() error {
-			routes, err := h.routesBuilder.BuildRoute(point, obj.Coordinates, route_builder.CarTransportType)
+			routes, err := h.routesBuilder.BuildRoute(point, obj.Coordinates.Point, route_builder.CarTransportType)
 			if err != nil {
 				return fmt.Errorf("build route: %w", err)
 			}

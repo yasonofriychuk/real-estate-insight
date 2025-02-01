@@ -3,8 +3,13 @@
 package api
 
 import (
+	"math/bits"
+	"strconv"
+
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
+
+	"github.com/ogen-go/ogen/validate"
 )
 
 // Encode encodes BuildRoutesByPointsBadRequest as json.
@@ -137,6 +142,375 @@ func (s BuildRoutesByPointsOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BuildRoutesByPointsOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DevelopmentSearchBoardBadRequest as json.
+func (s *DevelopmentSearchBoardBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*Error)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes DevelopmentSearchBoardBadRequest from json.
+func (s *DevelopmentSearchBoardBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DevelopmentSearchBoardBadRequest to nil")
+	}
+	var unwrapped Error
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = DevelopmentSearchBoardBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DevelopmentSearchBoardBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DevelopmentSearchBoardBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DevelopmentSearchBoardInternalServerError as json.
+func (s *DevelopmentSearchBoardInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*Error)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes DevelopmentSearchBoardInternalServerError from json.
+func (s *DevelopmentSearchBoardInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DevelopmentSearchBoardInternalServerError to nil")
+	}
+	var unwrapped Error
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = DevelopmentSearchBoardInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DevelopmentSearchBoardInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DevelopmentSearchBoardInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DevelopmentSearchBoardOKApplicationJSON as json.
+func (s DevelopmentSearchBoardOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := []DevelopmentSearchBoardOKItem(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes DevelopmentSearchBoardOKApplicationJSON from json.
+func (s *DevelopmentSearchBoardOKApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DevelopmentSearchBoardOKApplicationJSON to nil")
+	}
+	var unwrapped []DevelopmentSearchBoardOKItem
+	if err := func() error {
+		unwrapped = make([]DevelopmentSearchBoardOKItem, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem DevelopmentSearchBoardOKItem
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = DevelopmentSearchBoardOKApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DevelopmentSearchBoardOKApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DevelopmentSearchBoardOKApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DevelopmentSearchBoardOKItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DevelopmentSearchBoardOKItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("id")
+		e.Int(s.ID)
+	}
+	{
+		e.FieldStart("name")
+		e.Str(s.Name)
+	}
+	{
+		if s.Coords.Set {
+			e.FieldStart("coords")
+			s.Coords.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfDevelopmentSearchBoardOKItem = [3]string{
+	0: "id",
+	1: "name",
+	2: "coords",
+}
+
+// Decode decodes DevelopmentSearchBoardOKItem from json.
+func (s *DevelopmentSearchBoardOKItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DevelopmentSearchBoardOKItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.ID = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "name":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "coords":
+			if err := func() error {
+				s.Coords.Reset()
+				if err := s.Coords.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"coords\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DevelopmentSearchBoardOKItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfDevelopmentSearchBoardOKItem) {
+					name = jsonFieldsNameOfDevelopmentSearchBoardOKItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DevelopmentSearchBoardOKItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DevelopmentSearchBoardOKItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DevelopmentSearchBoardOKItemCoords) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DevelopmentSearchBoardOKItemCoords) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("lon")
+		e.Float64(s.Lon)
+	}
+	{
+		e.FieldStart("lat")
+		e.Float64(s.Lat)
+	}
+}
+
+var jsonFieldsNameOfDevelopmentSearchBoardOKItemCoords = [2]string{
+	0: "lon",
+	1: "lat",
+}
+
+// Decode decodes DevelopmentSearchBoardOKItemCoords from json.
+func (s *DevelopmentSearchBoardOKItemCoords) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DevelopmentSearchBoardOKItemCoords to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "lon":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Float64()
+				s.Lon = float64(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"lon\"")
+			}
+		case "lat":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Float64()
+				s.Lat = float64(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"lat\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DevelopmentSearchBoardOKItemCoords")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfDevelopmentSearchBoardOKItemCoords) {
+					name = jsonFieldsNameOfDevelopmentSearchBoardOKItemCoords[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DevelopmentSearchBoardOKItemCoords) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DevelopmentSearchBoardOKItemCoords) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -475,6 +849,39 @@ func (s ObjectsFindNearestInfrastructureOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ObjectsFindNearestInfrastructureOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DevelopmentSearchBoardOKItemCoords as json.
+func (o OptDevelopmentSearchBoardOKItemCoords) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes DevelopmentSearchBoardOKItemCoords from json.
+func (o *OptDevelopmentSearchBoardOKItemCoords) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDevelopmentSearchBoardOKItemCoords to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDevelopmentSearchBoardOKItemCoords) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDevelopmentSearchBoardOKItemCoords) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

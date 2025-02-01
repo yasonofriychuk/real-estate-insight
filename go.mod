@@ -8,13 +8,16 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/joho/godotenv v1.5.1
 	github.com/ogen-go/ogen v1.5.0
 	github.com/paulmach/go.geojson v1.5.0
 	github.com/paulmach/orb v0.1.3
 	github.com/qedus/osmpbf v1.2.0
+	github.com/samber/lo v1.49.1
 	go.opentelemetry.io/otel v1.31.0
 	go.opentelemetry.io/otel/metric v1.31.0
 	go.opentelemetry.io/otel/trace v1.31.0
+	golang.org/x/sync v0.10.0
 )
 
 require (
@@ -38,9 +41,8 @@ require (
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

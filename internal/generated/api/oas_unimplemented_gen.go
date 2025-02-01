@@ -22,6 +22,15 @@ func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params Buil
 	return r, ht.ErrNotImplemented
 }
 
+// DevelopmentSearchBoard implements developmentSearchBoard operation.
+//
+// Drawing the current terrain.
+//
+// GET /development/search/board
+func (UnimplementedHandler) DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (r DevelopmentSearchBoardRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
 //
 // Search for nearby infrastructure facilities.

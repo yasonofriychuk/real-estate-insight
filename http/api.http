@@ -13,3 +13,10 @@ GET {{host}}/routes/build/points?lonFrom={{lonFrom}}&latFrom={{latFrom}}&latTo={
 GET {{host}}/objects/find/nearestInfrastructure?objectTypes=hospital&objectTypes=sport&objectTypes=shops&objectTypes=kindergarten&objectTypes=busStop&lon={{lonFrom}}&lat={{latFrom}}
 
 ###
+GET {{host}}/development/search/board?
+    topLeftLon=73.45372857594197&
+    topLeftLat=61.25061044995226&
+    bottomRightLon=73.45166389831363&
+    bottomRightLat=61.25117104755381
+
+###
