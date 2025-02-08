@@ -50,28 +50,15 @@ func (s *Storage) GetNearestInfrastructure(ctx context.Context, point orb.Point,
 func modifyStatementByType(st squirrel.SelectBuilder, objType ObjType) squirrel.SelectBuilder {
 	switch objType {
 	case Hospital:
-		return st.Where(squirrel.Or{
-			squirrel.Expr("tags->'amenity' = 'hospital'"),
-			squirrel.Expr("tags->'amenity' = 'clinic'"),
-		})
+		return st.Where(squirrel.Expr("tags->'hospital' = 'yes'"))
 	case Sport:
-		return st.Where(squirrel.Or{
-			squirrel.Expr("tags->'leisure' = 'sports_centre'"),
-			squirrel.Expr("tags->'leisure' = 'stadium'"),
-			squirrel.Expr("tags->'leisure' = 'pitch'"),
-			squirrel.Expr("tags->'leisure' = 'fitness_centre'"),
-		})
+		return st.Where(squirrel.Expr("tags->'sport' = 'yes'"))
 	case Shops:
-		return st.Where("tags->'shop' is not null")
+		return st.Where(squirrel.Expr("tags->'shops' = 'yes'"))
 	case Kindergarten:
-		return st.Where(squirrel.Expr("tags->'amenity' = 'kindergarten'"))
+		return st.Where(squirrel.Expr("tags->'kindergarten' = 'yes'"))
 	case BusStop:
-		return st.Where(squirrel.Or{
-			squirrel.Expr("tags->'amenity' = 'bus_stop'"),
-			squirrel.Expr("tags->'public_transport' = 'stop_position'"),
-			squirrel.Expr("tags->'public_transport' = 'station'"),
-			squirrel.Expr("tags->'railway' = 'subway_entrance'"),
-		})
+		return st.Where(squirrel.Expr("tags->'bus_stop' = 'yes'"))
 	}
 	return st
 }
