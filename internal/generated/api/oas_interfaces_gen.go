@@ -5,10 +5,10 @@ type BuildRoutesByPointsRes interface {
 	buildRoutesByPointsRes()
 }
 
-type DevelopmentSearchBoardRes interface {
-	developmentSearchBoardRes()
+type DevelopmentSearchRes interface {
+	developmentSearchRes()
 }
 
-type ObjectsFindNearestInfrastructureRes interface {
-	objectsFindNearestInfrastructureRes()
+type InfrastructureRadiusBoardRes interface {
+	infrastructureRadiusBoardRes()
 }

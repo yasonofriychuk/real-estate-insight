@@ -22,20 +22,18 @@ func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params Buil
 	return r, ht.ErrNotImplemented
 }
 
-// DevelopmentSearchBoard implements developmentSearchBoard operation.
+// DevelopmentSearch implements developmentSearch operation.
 //
-// Drawing the current terrain.
-//
-// GET /development/search/board
-func (UnimplementedHandler) DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (r DevelopmentSearchBoardRes, _ error) {
+// POST /developments/search/filter
+func (UnimplementedHandler) DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (r DevelopmentSearchRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
+// InfrastructureRadiusBoard implements infrastructureRadiusBoard operation.
 //
-// Search for nearby infrastructure facilities.
+// Search for infrastructure around the selected residential complex.
 //
-// GET /objects/find/nearestInfrastructure
-func (UnimplementedHandler) ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (r ObjectsFindNearestInfrastructureRes, _ error) {
+// GET /infrastructure/radius
+func (UnimplementedHandler) InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (r InfrastructureRadiusBoardRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

@@ -9,11 +9,14 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/qedus/osmpbf"
+	"github.com/samber/lo"
 
 	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/postgres"
+	"github.com/yasonofriychuk/real-estate-insight/internal/osm"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/pbf_scanner"
+	"github.com/yasonofriychuk/real-estate-insight/internal/osm/utils"
 )
 
 const (
@@ -56,6 +59,9 @@ func main() {
 		if err != nil {
 			break
 		}
+		if len(utils.ObjectTypeByTags(node.Tags)) == 0 {
+			continue
+		}
 
 		nodesBatch = append(nodesBatch, node)
 		if len(nodesBatch) >= batchSize {
@@ -81,22 +87,16 @@ func main() {
 	log.WithContext(ctx).Info("OSM nodes have been successfully scanned and inserted into the database.")
 }
 
-func hQuote(str string) string {
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	return `"` + strings.Replace(str, "\"", "\\\"", -1) + `"`
-}
-
 func argsByNode(node osmpbf.Node) []any {
-	tagParts := make([]string, 0, len(node.Tags))
-	for k, v := range node.Tags {
-		if k == "" || v == "" {
-			continue
-		}
-		tagParts = append(tagParts, hQuote(k)+" => "+hQuote(v))
+	return []any{
+		node.ID,
+		node.Tags["name"],
+		strings.Join(lo.Map(utils.ObjectTypeByTags(node.Tags), func(t osm.ObjType, _ int) string {
+			return string(t) + " => yes"
+		}), ","),
+		node.Lon,
+		node.Lat,
 	}
-	tags := strings.Join(tagParts, ",")
-
-	return []any{node.ID, node.Tags["name"], tags, node.Lon, node.Lat}
 }
 
 // insertBatch выполняет вставку данных в таблицу батчем с использованием squirrel и поддержкой upsert

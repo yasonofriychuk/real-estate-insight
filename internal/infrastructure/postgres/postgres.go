@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -34,9 +33,7 @@ type Postgres struct {
 	maxPoolSize  int
 	connAttempts int
 	connTimeout  time.Duration
-
-	Builder squirrel.StatementBuilderType
-	Pool    PgxPool
+	Pool         PgxPool
 }
 
 func New(url string, opts ...Option) (*Postgres, error) {
@@ -50,8 +47,6 @@ func New(url string, opts ...Option) (*Postgres, error) {
 		opt(pg)
 	}
 
-	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
 	poolConfig, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, fmt.Errorf("pgdb - New - pgxpool.ParseConfig: %w", err)
@@ -59,8 +54,9 @@ func New(url string, opts ...Option) (*Postgres, error) {
 
 	poolConfig.MaxConns = int32(pg.maxPoolSize)
 
+	var pool *pgxpool.Pool
 	for pg.connAttempts > 0 {
-		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
+		pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
 		if err == nil {
 			break
 		}
@@ -73,9 +69,12 @@ func New(url string, opts ...Option) (*Postgres, error) {
 		return nil, fmt.Errorf("pgdb - New - pgxpool.ConnectConfig: %w", err)
 	}
 
+	pg = &Postgres{
+		Pool: pool,
+	}
+
 	return pg, nil
 }
-
 func (p *Postgres) Close() {
 	if p.Pool != nil {
 		p.Pool.Close()

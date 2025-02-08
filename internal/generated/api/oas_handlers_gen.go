@@ -125,21 +125,13 @@ func (s *Server) handleBuildRoutesByPointsRequest(args [0]string, argsEscaped bo
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "latFrom",
+					Name: "developmentId",
 					In:   "query",
-				}: params.LatFrom,
+				}: params.DevelopmentId,
 				{
-					Name: "lonFrom",
+					Name: "osmId",
 					In:   "query",
-				}: params.LonFrom,
-				{
-					Name: "latTo",
-					In:   "query",
-				}: params.LatTo,
-				{
-					Name: "lonTo",
-					In:   "query",
-				}: params.LonTo,
+				}: params.OsmId,
 			},
 			Raw: r,
 		}
@@ -180,22 +172,20 @@ func (s *Server) handleBuildRoutesByPointsRequest(args [0]string, argsEscaped bo
 	}
 }
 
-// handleDevelopmentSearchBoardRequest handles developmentSearchBoard operation.
+// handleDevelopmentSearchRequest handles developmentSearch operation.
 //
-// Drawing the current terrain.
-//
-// GET /development/search/board
-func (s *Server) handleDevelopmentSearchBoardRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /developments/search/filter
+func (s *Server) handleDevelopmentSearchRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("developmentSearchBoard"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/development/search/board"),
+		otelogen.OperationID("developmentSearch"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/developments/search/filter"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), DevelopmentSearchBoardOperation,
+	ctx, span := s.cfg.Tracer.Start(r.Context(), DevelopmentSearchOperation,
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -250,54 +240,42 @@ func (s *Server) handleDevelopmentSearchBoardRequest(args [0]string, argsEscaped
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: DevelopmentSearchBoardOperation,
-			ID:   "developmentSearchBoard",
+			Name: DevelopmentSearchOperation,
+			ID:   "developmentSearch",
 		}
 	)
-	params, err := decodeDevelopmentSearchBoardParams(args, argsEscaped, r)
+	request, close, err := s.decodeDevelopmentSearchRequest(r)
 	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
+		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
 			Err:              err,
 		}
-		defer recordError("DecodeParams", err)
+		defer recordError("DecodeRequest", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
-	var response DevelopmentSearchBoardRes
+	var response DevelopmentSearchRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    DevelopmentSearchBoardOperation,
-			OperationSummary: "Drawing the current terrain",
-			OperationID:      "developmentSearchBoard",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "topLeftLon",
-					In:   "query",
-				}: params.TopLeftLon,
-				{
-					Name: "topLeftLat",
-					In:   "query",
-				}: params.TopLeftLat,
-				{
-					Name: "bottomRightLon",
-					In:   "query",
-				}: params.BottomRightLon,
-				{
-					Name: "bottomRightLat",
-					In:   "query",
-				}: params.BottomRightLat,
-			},
-			Raw: r,
+			OperationName:    DevelopmentSearchOperation,
+			OperationSummary: "",
+			OperationID:      "developmentSearch",
+			Body:             request,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
-			Request  = struct{}
-			Params   = DevelopmentSearchBoardParams
-			Response = DevelopmentSearchBoardRes
+			Request  = *DevelopmentSearchReq
+			Params   = struct{}
+			Response = DevelopmentSearchRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -306,14 +284,14 @@ func (s *Server) handleDevelopmentSearchBoardRequest(args [0]string, argsEscaped
 		](
 			m,
 			mreq,
-			unpackDevelopmentSearchBoardParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DevelopmentSearchBoard(ctx, params)
+				response, err = s.h.DevelopmentSearch(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DevelopmentSearchBoard(ctx, params)
+		response, err = s.h.DevelopmentSearch(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -321,7 +299,7 @@ func (s *Server) handleDevelopmentSearchBoardRequest(args [0]string, argsEscaped
 		return
 	}
 
-	if err := encodeDevelopmentSearchBoardResponse(response, w, span); err != nil {
+	if err := encodeDevelopmentSearchResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -330,22 +308,22 @@ func (s *Server) handleDevelopmentSearchBoardRequest(args [0]string, argsEscaped
 	}
 }
 
-// handleObjectsFindNearestInfrastructureRequest handles objectsFindNearestInfrastructure operation.
+// handleInfrastructureRadiusBoardRequest handles infrastructureRadiusBoard operation.
 //
-// Search for nearby infrastructure facilities.
+// Search for infrastructure around the selected residential complex.
 //
-// GET /objects/find/nearestInfrastructure
-func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /infrastructure/radius
+func (s *Server) handleInfrastructureRadiusBoardRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("objectsFindNearestInfrastructure"),
+		otelogen.OperationID("infrastructureRadiusBoard"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/objects/find/nearestInfrastructure"),
+		semconv.HTTPRouteKey.String("/infrastructure/radius"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), ObjectsFindNearestInfrastructureOperation,
+	ctx, span := s.cfg.Tracer.Start(r.Context(), InfrastructureRadiusBoardOperation,
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -400,11 +378,11 @@ func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, a
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: ObjectsFindNearestInfrastructureOperation,
-			ID:   "objectsFindNearestInfrastructure",
+			Name: InfrastructureRadiusBoardOperation,
+			ID:   "infrastructureRadiusBoard",
 		}
 	)
-	params, err := decodeObjectsFindNearestInfrastructureParams(args, argsEscaped, r)
+	params, err := decodeInfrastructureRadiusBoardParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -415,35 +393,31 @@ func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, a
 		return
 	}
 
-	var response ObjectsFindNearestInfrastructureRes
+	var response InfrastructureRadiusBoardRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    ObjectsFindNearestInfrastructureOperation,
-			OperationSummary: "Search for nearby infrastructure facilities",
-			OperationID:      "objectsFindNearestInfrastructure",
+			OperationName:    InfrastructureRadiusBoardOperation,
+			OperationSummary: "Search for infrastructure around the selected residential complex",
+			OperationID:      "infrastructureRadiusBoard",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "lat",
+					Name: "developmentId",
 					In:   "query",
-				}: params.Lat,
+				}: params.DevelopmentId,
 				{
-					Name: "lon",
+					Name: "radius",
 					In:   "query",
-				}: params.Lon,
-				{
-					Name: "objectTypes",
-					In:   "query",
-				}: params.ObjectTypes,
+				}: params.Radius,
 			},
 			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = ObjectsFindNearestInfrastructureParams
-			Response = ObjectsFindNearestInfrastructureRes
+			Params   = InfrastructureRadiusBoardParams
+			Response = InfrastructureRadiusBoardRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -452,14 +426,14 @@ func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, a
 		](
 			m,
 			mreq,
-			unpackObjectsFindNearestInfrastructureParams,
+			unpackInfrastructureRadiusBoardParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ObjectsFindNearestInfrastructure(ctx, params)
+				response, err = s.h.InfrastructureRadiusBoard(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ObjectsFindNearestInfrastructure(ctx, params)
+		response, err = s.h.InfrastructureRadiusBoard(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -467,7 +441,7 @@ func (s *Server) handleObjectsFindNearestInfrastructureRequest(args [0]string, a
 		return
 	}
 
-	if err := encodeObjectsFindNearestInfrastructureResponse(response, w, span); err != nil {
+	if err := encodeInfrastructureRadiusBoardResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

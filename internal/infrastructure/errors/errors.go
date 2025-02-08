@@ -19,22 +19,10 @@ func BuildError(code int, message string) api.Error {
 	}
 
 	return api.Error{
-		Status: api.OptErrorStatus{
-			Value: status,
-			Set:   true,
-		},
-		Error: api.OptErrorError{
-			Value: api.ErrorError{
-				Code: api.OptInt{
-					Value: code,
-					Set:   true,
-				},
-				Message: api.OptString{
-					Value: message,
-					Set:   true,
-				},
-			},
-			Set: true,
+		Status: status,
+		Error: api.ErrorError{
+			Code:    code,
+			Message: message,
 		},
 	}
 }

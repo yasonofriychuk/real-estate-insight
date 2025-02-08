@@ -14,18 +14,16 @@ type Handler interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
-	// DevelopmentSearchBoard implements developmentSearchBoard operation.
+	// DevelopmentSearch implements developmentSearch operation.
 	//
-	// Drawing the current terrain.
+	// POST /developments/search/filter
+	DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// InfrastructureRadiusBoard implements infrastructureRadiusBoard operation.
 	//
-	// GET /development/search/board
-	DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error)
-	// ObjectsFindNearestInfrastructure implements objectsFindNearestInfrastructure operation.
+	// Search for infrastructure around the selected residential complex.
 	//
-	// Search for nearby infrastructure facilities.
-	//
-	// GET /objects/find/nearestInfrastructure
-	ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (ObjectsFindNearestInfrastructureRes, error)
+	// GET /infrastructure/radius
+	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

@@ -7,15 +7,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rs/cors"
+
 	serviceapi "github.com/yasonofriychuk/real-estate-insight/internal/api"
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/development/development_search_board"
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/objects/objects_find_nearest_infrastructure"
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/routes/build_routes_by_points"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/build_routes_by_points"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/development_search_filter"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_radius_board"
 	"github.com/yasonofriychuk/real-estate-insight/internal/config"
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/logger"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/coordinates"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/development"
-	osm_storage "github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/osm"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/infrastructure"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/postgres"
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm/route_builder"
 )
@@ -32,13 +35,14 @@ func main() {
 	}
 	defer pg.Close()
 
-	osmStorage := osm_storage.New(pg.Pool)
 	developmentStorage := development.New(pg.Pool)
+	infrastructureStorage := infrastructure.New(pg.Pool)
+	coordinatesStorage := coordinates.New(pg.Pool)
 
 	srv := serviceapi.API{
-		BuildRoutesByPointsHandler:              build_routes_by_points.New(log, rb),
-		ObjectsFindNearestInfrastructureHandler: objects_find_nearest_infrastructure.New(log, osmStorage, rb),
-		DevelopmentSearchBoardHandler:           development_search_board.New(log, developmentStorage),
+		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
+		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage),
+		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
 	}
 
 	server, err := api.NewServer(srv)
@@ -51,7 +55,12 @@ func main() {
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", server))
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.HttpPort()), mux); err != nil {
+	log.WithContext(ctx).Info("server start")
+
+	if err := http.ListenAndServe(
+		fmt.Sprintf(":%s", cfg.HttpPort()),
+		cors.New(cors.Options{AllowedOrigins: []string{}}).Handler(mux),
+	); err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to start server")
 		os.Exit(1)
 	}

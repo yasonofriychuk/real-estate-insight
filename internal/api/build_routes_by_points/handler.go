@@ -2,12 +2,15 @@ package build_routes_by_points
 
 import (
 	"context"
+	std_errors "errors"
 	"fmt"
 	"net/http"
 
 	"github.com/AlekSi/pointer"
+	"github.com/jackc/pgx/v5"
 	geojson "github.com/paulmach/go.geojson"
 	"github.com/paulmach/orb"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/yasonofriychuk/real-estate-insight/internal/generated/api"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/errors"
@@ -18,18 +21,56 @@ import (
 type BuildRoutesByPointsHandler struct {
 	log           logger.Log
 	routesBuilder routesBuilder
+	storage       storage
 }
 
-func New(log logger.Log, routesBuilder routesBuilder) *BuildRoutesByPointsHandler {
+func New(log logger.Log, routesBuilder routesBuilder, storage storage) *BuildRoutesByPointsHandler {
 	return &BuildRoutesByPointsHandler{
 		log:           log,
 		routesBuilder: routesBuilder,
+		storage:       storage,
 	}
 }
 
 func (h *BuildRoutesByPointsHandler) BuildRoutesByPoints(ctx context.Context, params api.BuildRoutesByPointsParams) (api.BuildRoutesByPointsRes, error) {
-	fromPoint := orb.Point{params.LonFrom.Value, params.LatFrom.Value}
-	toPoint := orb.Point{params.LonTo.Value, params.LatTo.Value}
+	var fromPoint, toPoint orb.Point
+
+	errGroup, errCtx := errgroup.WithContext(ctx)
+
+	errGroup.Go(func() error {
+		var err error
+		fromPoint, err = h.storage.GetCoordinatesDevelopmentById(errCtx, params.DevelopmentId)
+		if err != nil {
+			return fmt.Errorf("storage.GetCoordinatesDevelopmentById: %w", err)
+		}
+		return nil
+	})
+
+	errGroup.Go(func() error {
+		var err error
+		toPoint, err = h.storage.GetCoordinatesOsmById(errCtx, params.OsmId)
+		if err != nil {
+			return fmt.Errorf("storage.GetCoordinatesOsmById: %w", err)
+		}
+		return nil
+	})
+
+	if err := errGroup.Wait(); err != nil {
+		if std_errors.Is(err, pgx.ErrNoRows) {
+			return pointer.To(
+				api.BuildRoutesByPointsNotFound(
+					errors.BuildError(http.StatusNotFound, err.Error()),
+				),
+			), nil
+		}
+
+		h.log.WithContext(errCtx).WithError(err).Error("failed to get points coords")
+		return pointer.To(
+			api.BuildRoutesByPointsInternalServerError(
+				errors.BuildError(http.StatusInternalServerError, err.Error()),
+			),
+		), nil
+	}
 
 	routes, err := h.routesBuilder.BuildRoute(fromPoint, toPoint, route_builder.FootTransportType)
 	if err != nil {
@@ -38,7 +79,7 @@ func (h *BuildRoutesByPointsHandler) BuildRoutesByPoints(ctx context.Context, pa
 			api.BuildRoutesByPointsInternalServerError(
 				errors.BuildError(http.StatusInternalServerError, "failed to build routes"),
 			),
-		), err
+		), nil
 	}
 
 	featureCollection := geojson.NewFeatureCollection()
@@ -55,7 +96,7 @@ func (h *BuildRoutesByPointsHandler) BuildRoutesByPoints(ctx context.Context, pa
 			api.BuildRoutesByPointsInternalServerError(
 				errors.BuildError(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError)),
 			),
-		), err
+		), nil
 	}
 
 	res := make(api.BuildRoutesByPointsOK)
@@ -65,7 +106,7 @@ func (h *BuildRoutesByPointsHandler) BuildRoutesByPoints(ctx context.Context, pa
 			api.BuildRoutesByPointsInternalServerError(
 				errors.BuildError(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError)),
 			),
-		), err
+		), nil
 	}
 
 	return &res, nil

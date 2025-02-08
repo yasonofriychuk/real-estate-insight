@@ -60,9 +60,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			switch elem[0] {
-			case 'd': // Prefix: "development/search/board"
+			case 'd': // Prefix: "developments/search/filter"
 				origElem := elem
-				if l := len("development/search/board"); len(elem) >= l && elem[0:l] == "development/search/board" {
+				if l := len("developments/search/filter"); len(elem) >= l && elem[0:l] == "developments/search/filter" {
 					elem = elem[l:]
 				} else {
 					break
@@ -71,19 +71,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch r.Method {
-					case "GET":
-						s.handleDevelopmentSearchBoardRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleDevelopmentSearchRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET")
+						s.notAllowed(w, r, "POST")
 					}
 
 					return
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "objects/find/nearestInfrastructure"
+			case 'i': // Prefix: "infrastructure/radius"
 				origElem := elem
-				if l := len("objects/find/nearestInfrastructure"); len(elem) >= l && elem[0:l] == "objects/find/nearestInfrastructure" {
+				if l := len("infrastructure/radius"); len(elem) >= l && elem[0:l] == "infrastructure/radius" {
 					elem = elem[l:]
 				} else {
 					break
@@ -93,7 +93,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "GET":
-						s.handleObjectsFindNearestInfrastructureRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleInfrastructureRadiusBoardRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET")
 					}
@@ -218,9 +218,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				break
 			}
 			switch elem[0] {
-			case 'd': // Prefix: "development/search/board"
+			case 'd': // Prefix: "developments/search/filter"
 				origElem := elem
-				if l := len("development/search/board"); len(elem) >= l && elem[0:l] == "development/search/board" {
+				if l := len("developments/search/filter"); len(elem) >= l && elem[0:l] == "developments/search/filter" {
 					elem = elem[l:]
 				} else {
 					break
@@ -229,11 +229,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch method {
-					case "GET":
-						r.name = DevelopmentSearchBoardOperation
-						r.summary = "Drawing the current terrain"
-						r.operationID = "developmentSearchBoard"
-						r.pathPattern = "/development/search/board"
+					case "POST":
+						r.name = DevelopmentSearchOperation
+						r.summary = ""
+						r.operationID = "developmentSearch"
+						r.pathPattern = "/developments/search/filter"
 						r.args = args
 						r.count = 0
 						return r, true
@@ -243,9 +243,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "objects/find/nearestInfrastructure"
+			case 'i': // Prefix: "infrastructure/radius"
 				origElem := elem
-				if l := len("objects/find/nearestInfrastructure"); len(elem) >= l && elem[0:l] == "objects/find/nearestInfrastructure" {
+				if l := len("infrastructure/radius"); len(elem) >= l && elem[0:l] == "infrastructure/radius" {
 					elem = elem[l:]
 				} else {
 					break
@@ -255,10 +255,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "GET":
-						r.name = ObjectsFindNearestInfrastructureOperation
-						r.summary = "Search for nearby infrastructure facilities"
-						r.operationID = "objectsFindNearestInfrastructure"
-						r.pathPattern = "/objects/find/nearestInfrastructure"
+						r.name = InfrastructureRadiusBoardOperation
+						r.summary = "Search for infrastructure around the selected residential complex"
+						r.operationID = "infrastructureRadiusBoard"
+						r.pathPattern = "/infrastructure/radius"
 						r.args = args
 						r.count = 0
 						return r, true

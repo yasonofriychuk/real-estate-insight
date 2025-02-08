@@ -34,18 +34,16 @@ type Invoker interface {
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
-	// DevelopmentSearchBoard invokes developmentSearchBoard operation.
+	// DevelopmentSearch invokes developmentSearch operation.
 	//
-	// Drawing the current terrain.
+	// POST /developments/search/filter
+	DevelopmentSearch(ctx context.Context, request *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// InfrastructureRadiusBoard invokes infrastructureRadiusBoard operation.
 	//
-	// GET /development/search/board
-	DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error)
-	// ObjectsFindNearestInfrastructure invokes objectsFindNearestInfrastructure operation.
+	// Search for infrastructure around the selected residential complex.
 	//
-	// Search for nearby infrastructure facilities.
-	//
-	// GET /objects/find/nearestInfrastructure
-	ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (ObjectsFindNearestInfrastructureRes, error)
+	// GET /infrastructure/radius
+	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
 }
 
 // Client implements OAS client.
@@ -144,69 +142,29 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "latFrom" parameter.
+		// Encode "developmentId" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "latFrom",
+			Name:    "developmentId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.LatFrom.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
+			return e.EncodeValue(conv.Int64ToString(params.DevelopmentId))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	{
-		// Encode "lonFrom" parameter.
+		// Encode "osmId" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "lonFrom",
+			Name:    "osmId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.LonFrom.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "latTo" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "latTo",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.LatTo.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "lonTo" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "lonTo",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.LonTo.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
+			return e.EncodeValue(conv.Int64ToString(params.OsmId))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -235,21 +193,19 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 	return result, nil
 }
 
-// DevelopmentSearchBoard invokes developmentSearchBoard operation.
+// DevelopmentSearch invokes developmentSearch operation.
 //
-// Drawing the current terrain.
-//
-// GET /development/search/board
-func (c *Client) DevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (DevelopmentSearchBoardRes, error) {
-	res, err := c.sendDevelopmentSearchBoard(ctx, params)
+// POST /developments/search/filter
+func (c *Client) DevelopmentSearch(ctx context.Context, request *DevelopmentSearchReq) (DevelopmentSearchRes, error) {
+	res, err := c.sendDevelopmentSearch(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params DevelopmentSearchBoardParams) (res DevelopmentSearchBoardRes, err error) {
+func (c *Client) sendDevelopmentSearch(ctx context.Context, request *DevelopmentSearchReq) (res DevelopmentSearchRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("developmentSearchBoard"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/development/search/board"),
+		otelogen.OperationID("developmentSearch"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/developments/search/filter"),
 	}
 
 	// Run stopwatch.
@@ -264,7 +220,7 @@ func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params Developm
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, DevelopmentSearchBoardOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, DevelopmentSearchOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -282,73 +238,16 @@ func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params Developm
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/development/search/board"
+	pathParts[0] = "/developments/search/filter"
 	uri.AddPathParts(u, pathParts[:]...)
 
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "topLeftLon" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "topLeftLon",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.Float64ToString(params.TopLeftLon))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "topLeftLat" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "topLeftLat",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.Float64ToString(params.TopLeftLat))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "bottomRightLon" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "bottomRightLon",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.Float64ToString(params.BottomRightLon))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "bottomRightLat" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "bottomRightLat",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.Float64ToString(params.BottomRightLat))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeDevelopmentSearchRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
 	stage = "SendRequest"
@@ -359,7 +258,7 @@ func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params Developm
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeDevelopmentSearchBoardResponse(resp)
+	result, err := decodeDevelopmentSearchResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -367,21 +266,21 @@ func (c *Client) sendDevelopmentSearchBoard(ctx context.Context, params Developm
 	return result, nil
 }
 
-// ObjectsFindNearestInfrastructure invokes objectsFindNearestInfrastructure operation.
+// InfrastructureRadiusBoard invokes infrastructureRadiusBoard operation.
 //
-// Search for nearby infrastructure facilities.
+// Search for infrastructure around the selected residential complex.
 //
-// GET /objects/find/nearestInfrastructure
-func (c *Client) ObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (ObjectsFindNearestInfrastructureRes, error) {
-	res, err := c.sendObjectsFindNearestInfrastructure(ctx, params)
+// GET /infrastructure/radius
+func (c *Client) InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error) {
+	res, err := c.sendInfrastructureRadiusBoard(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendObjectsFindNearestInfrastructure(ctx context.Context, params ObjectsFindNearestInfrastructureParams) (res ObjectsFindNearestInfrastructureRes, err error) {
+func (c *Client) sendInfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (res InfrastructureRadiusBoardRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("objectsFindNearestInfrastructure"),
+		otelogen.OperationID("infrastructureRadiusBoard"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/objects/find/nearestInfrastructure"),
+		semconv.HTTPRouteKey.String("/infrastructure/radius"),
 	}
 
 	// Run stopwatch.
@@ -396,7 +295,7 @@ func (c *Client) sendObjectsFindNearestInfrastructure(ctx context.Context, param
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, ObjectsFindNearestInfrastructureOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, InfrastructureRadiusBoardOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -414,67 +313,35 @@ func (c *Client) sendObjectsFindNearestInfrastructure(ctx context.Context, param
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/objects/find/nearestInfrastructure"
+	pathParts[0] = "/infrastructure/radius"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "lat" parameter.
+		// Encode "developmentId" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "lat",
+			Name:    "developmentId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Lat.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
+			return e.EncodeValue(conv.IntToString(params.DevelopmentId))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	{
-		// Encode "lon" parameter.
+		// Encode "radius" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "lon",
+			Name:    "radius",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Lon.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "objectTypes" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "objectTypes",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.ObjectTypes != nil {
-				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.ObjectTypes {
-						if err := func() error {
-							return e.EncodeValue(conv.StringToString(string(item)))
-						}(); err != nil {
-							return errors.Wrapf(err, "[%d]", i)
-						}
-					}
-					return nil
-				})
-			}
-			return nil
+			return e.EncodeValue(conv.IntToString(params.Radius))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -495,7 +362,7 @@ func (c *Client) sendObjectsFindNearestInfrastructure(ctx context.Context, param
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeObjectsFindNearestInfrastructureResponse(resp)
+	result, err := decodeInfrastructureRadiusBoardResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

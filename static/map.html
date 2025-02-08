@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <title>ИАС подбора объектов недвижимости</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css' rel='stylesheet' />
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="app">
+    <!-- Левый блок с ЖК -->
+    <div id="sidebar">
+        <div id="search-bar">
+            <input type="text" id="search-input" placeholder="Поиск...">
+            <button id="filter-btn">Фильтры</button>
+        </div>
+
+        <!-- Список ЖК -->
+        <div id="jks-list"></div>
+
+        <!-- Пагинация -->
+        <div id="pagination">
+            <button id="prev-page" disabled>«</button>
+            <span id="page-info">Страница 1</span>
+            <button id="next-page">»</button>
+        </div>
+
+        <!-- Детальная информация о ЖК -->
+        <div id="jk-details" class="hidden">
+            <button id="back-btn">Назад</button>
+            <div id="jk-details-content"></div>
+        </div>
+
+        <!--  Фильтры  -->
+        <div id="filter-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Фильтры</h2>
+                <p>Здесь будут настройки</p>
+                <button id="close-filter-btn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!--  Карта  -->
+    <div id="map"></div>
+</div>
+
+<script src="app.js"></script>
+<script src="scripts/map.js"></script>
+<script src="scripts/jklist.js"></script>
+</body>
+
+</html>

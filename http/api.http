@@ -5,7 +5,7 @@
 @lonTo=73.36503933069116
 
 ### Построение маршрута между двумя точками
-GET {{host}}/routes/build/points?lonFrom={{lonFrom}}&latFrom={{latFrom}}&latTo={{latTo}}&lonTo={{lonTo}}
+GET {{host}}/routes/build/points?developmentId=1&osmId=3488007902
 
 ###
 

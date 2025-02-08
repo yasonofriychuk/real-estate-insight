@@ -95,6 +95,50 @@ func decodeBuildRoutesByPointsResponse(resp *http.Response) (res BuildRoutesByPo
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response BuildRoutesByPointsNotFound
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	case 500:
 		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -143,7 +187,7 @@ func decodeBuildRoutesByPointsResponse(resp *http.Response) (res BuildRoutesByPo
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeDevelopmentSearchBoardResponse(resp *http.Response) (res DevelopmentSearchBoardRes, _ error) {
+func decodeDevelopmentSearchResponse(resp *http.Response) (res DevelopmentSearchRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -159,7 +203,7 @@ func decodeDevelopmentSearchBoardResponse(resp *http.Response) (res DevelopmentS
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response DevelopmentSearchBoardOKApplicationJSON
+			var response DevelopmentSearchOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -203,7 +247,7 @@ func decodeDevelopmentSearchBoardResponse(resp *http.Response) (res DevelopmentS
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response DevelopmentSearchBoardBadRequest
+			var response DevelopmentSearchBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -247,7 +291,7 @@ func decodeDevelopmentSearchBoardResponse(resp *http.Response) (res DevelopmentS
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response DevelopmentSearchBoardInternalServerError
+			var response DevelopmentSearchInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -281,7 +325,7 @@ func decodeDevelopmentSearchBoardResponse(resp *http.Response) (res DevelopmentS
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeObjectsFindNearestInfrastructureResponse(resp *http.Response) (res ObjectsFindNearestInfrastructureRes, _ error) {
+func decodeInfrastructureRadiusBoardResponse(resp *http.Response) (res InfrastructureRadiusBoardRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -297,7 +341,7 @@ func decodeObjectsFindNearestInfrastructureResponse(resp *http.Response) (res Ob
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ObjectsFindNearestInfrastructureOK
+			var response InfrastructureRadiusBoardOKApplicationJSON
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -313,6 +357,15 @@ func decodeObjectsFindNearestInfrastructureResponse(resp *http.Response) (res Ob
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -332,7 +385,51 @@ func decodeObjectsFindNearestInfrastructureResponse(resp *http.Response) (res Ob
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ObjectsFindNearestInfrastructureBadRequest
+			var response InfrastructureRadiusBoardBadRequest
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 404:
+		// Code 404.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response InfrastructureRadiusBoardNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -376,7 +473,7 @@ func decodeObjectsFindNearestInfrastructureResponse(resp *http.Response) (res Ob
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ObjectsFindNearestInfrastructureInternalServerError
+			var response InfrastructureRadiusBoardInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

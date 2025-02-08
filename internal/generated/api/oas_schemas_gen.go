@@ -15,6 +15,10 @@ type BuildRoutesByPointsInternalServerError Error
 
 func (*BuildRoutesByPointsInternalServerError) buildRoutesByPointsRes() {}
 
+type BuildRoutesByPointsNotFound Error
+
+func (*BuildRoutesByPointsNotFound) buildRoutesByPointsRes() {}
+
 type BuildRoutesByPointsOK map[string]jx.Raw
 
 func (s *BuildRoutesByPointsOK) init() BuildRoutesByPointsOK {
@@ -28,131 +32,299 @@ func (s *BuildRoutesByPointsOK) init() BuildRoutesByPointsOK {
 
 func (*BuildRoutesByPointsOK) buildRoutesByPointsRes() {}
 
-type DevelopmentSearchBoardBadRequest Error
-
-func (*DevelopmentSearchBoardBadRequest) developmentSearchBoardRes() {}
-
-type DevelopmentSearchBoardInternalServerError Error
-
-func (*DevelopmentSearchBoardInternalServerError) developmentSearchBoardRes() {}
-
-type DevelopmentSearchBoardOKApplicationJSON []DevelopmentSearchBoardOKItem
-
-func (*DevelopmentSearchBoardOKApplicationJSON) developmentSearchBoardRes() {}
-
-type DevelopmentSearchBoardOKItem struct {
-	ID     int                                   `json:"id"`
-	Name   string                                `json:"name"`
-	Coords OptDevelopmentSearchBoardOKItemCoords `json:"coords"`
+// Ref: #/components/schemas/development
+type Development struct {
+	ID          int64             `json:"id"`
+	Name        string            `json:"name"`
+	Coords      DevelopmentCoords `json:"coords"`
+	ImageUrl    string            `json:"imageUrl"`
+	Description string            `json:"description"`
 }
 
 // GetID returns the value of ID.
-func (s *DevelopmentSearchBoardOKItem) GetID() int {
+func (s *Development) GetID() int64 {
 	return s.ID
 }
 
 // GetName returns the value of Name.
-func (s *DevelopmentSearchBoardOKItem) GetName() string {
+func (s *Development) GetName() string {
 	return s.Name
 }
 
 // GetCoords returns the value of Coords.
-func (s *DevelopmentSearchBoardOKItem) GetCoords() OptDevelopmentSearchBoardOKItemCoords {
+func (s *Development) GetCoords() DevelopmentCoords {
 	return s.Coords
 }
 
+// GetImageUrl returns the value of ImageUrl.
+func (s *Development) GetImageUrl() string {
+	return s.ImageUrl
+}
+
+// GetDescription returns the value of Description.
+func (s *Development) GetDescription() string {
+	return s.Description
+}
+
 // SetID sets the value of ID.
-func (s *DevelopmentSearchBoardOKItem) SetID(val int) {
+func (s *Development) SetID(val int64) {
 	s.ID = val
 }
 
 // SetName sets the value of Name.
-func (s *DevelopmentSearchBoardOKItem) SetName(val string) {
+func (s *Development) SetName(val string) {
 	s.Name = val
 }
 
 // SetCoords sets the value of Coords.
-func (s *DevelopmentSearchBoardOKItem) SetCoords(val OptDevelopmentSearchBoardOKItemCoords) {
+func (s *Development) SetCoords(val DevelopmentCoords) {
 	s.Coords = val
 }
 
-type DevelopmentSearchBoardOKItemCoords struct {
-	Lon float64 `json:"lon"`
-	Lat float64 `json:"lat"`
+// SetImageUrl sets the value of ImageUrl.
+func (s *Development) SetImageUrl(val string) {
+	s.ImageUrl = val
 }
 
-// GetLon returns the value of Lon.
-func (s *DevelopmentSearchBoardOKItemCoords) GetLon() float64 {
-	return s.Lon
+// SetDescription sets the value of Description.
+func (s *Development) SetDescription(val string) {
+	s.Description = val
+}
+
+type DevelopmentCoords struct {
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lon"`
 }
 
 // GetLat returns the value of Lat.
-func (s *DevelopmentSearchBoardOKItemCoords) GetLat() float64 {
+func (s *DevelopmentCoords) GetLat() float64 {
 	return s.Lat
 }
 
-// SetLon sets the value of Lon.
-func (s *DevelopmentSearchBoardOKItemCoords) SetLon(val float64) {
-	s.Lon = val
+// GetLon returns the value of Lon.
+func (s *DevelopmentCoords) GetLon() float64 {
+	return s.Lon
 }
 
 // SetLat sets the value of Lat.
-func (s *DevelopmentSearchBoardOKItemCoords) SetLat(val float64) {
+func (s *DevelopmentCoords) SetLat(val float64) {
 	s.Lat = val
+}
+
+// SetLon sets the value of Lon.
+func (s *DevelopmentCoords) SetLon(val float64) {
+	s.Lon = val
+}
+
+type DevelopmentSearchBadRequest Error
+
+func (*DevelopmentSearchBadRequest) developmentSearchRes() {}
+
+type DevelopmentSearchInternalServerError Error
+
+func (*DevelopmentSearchInternalServerError) developmentSearchRes() {}
+
+type DevelopmentSearchOK struct {
+	Developments []Development           `json:"developments"`
+	Meta         DevelopmentSearchOKMeta `json:"meta"`
+}
+
+// GetDevelopments returns the value of Developments.
+func (s *DevelopmentSearchOK) GetDevelopments() []Development {
+	return s.Developments
+}
+
+// GetMeta returns the value of Meta.
+func (s *DevelopmentSearchOK) GetMeta() DevelopmentSearchOKMeta {
+	return s.Meta
+}
+
+// SetDevelopments sets the value of Developments.
+func (s *DevelopmentSearchOK) SetDevelopments(val []Development) {
+	s.Developments = val
+}
+
+// SetMeta sets the value of Meta.
+func (s *DevelopmentSearchOK) SetMeta(val DevelopmentSearchOKMeta) {
+	s.Meta = val
+}
+
+func (*DevelopmentSearchOK) developmentSearchRes() {}
+
+type DevelopmentSearchOKMeta struct {
+	Total int64 `json:"total"`
+}
+
+// GetTotal returns the value of Total.
+func (s *DevelopmentSearchOKMeta) GetTotal() int64 {
+	return s.Total
+}
+
+// SetTotal sets the value of Total.
+func (s *DevelopmentSearchOKMeta) SetTotal(val int64) {
+	s.Total = val
+}
+
+type DevelopmentSearchReq struct {
+	SearchQuery OptString                         `json:"searchQuery"`
+	Pagination  OptDevelopmentSearchReqPagination `json:"pagination"`
+	Board       OptDevelopmentSearchReqBoard      `json:"board"`
+}
+
+// GetSearchQuery returns the value of SearchQuery.
+func (s *DevelopmentSearchReq) GetSearchQuery() OptString {
+	return s.SearchQuery
+}
+
+// GetPagination returns the value of Pagination.
+func (s *DevelopmentSearchReq) GetPagination() OptDevelopmentSearchReqPagination {
+	return s.Pagination
+}
+
+// GetBoard returns the value of Board.
+func (s *DevelopmentSearchReq) GetBoard() OptDevelopmentSearchReqBoard {
+	return s.Board
+}
+
+// SetSearchQuery sets the value of SearchQuery.
+func (s *DevelopmentSearchReq) SetSearchQuery(val OptString) {
+	s.SearchQuery = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *DevelopmentSearchReq) SetPagination(val OptDevelopmentSearchReqPagination) {
+	s.Pagination = val
+}
+
+// SetBoard sets the value of Board.
+func (s *DevelopmentSearchReq) SetBoard(val OptDevelopmentSearchReqBoard) {
+	s.Board = val
+}
+
+type DevelopmentSearchReqBoard struct {
+	TopLeftLon     float64 `json:"topLeftLon"`
+	TopLeftLat     float64 `json:"topLeftLat"`
+	BottomRightLon float64 `json:"bottomRightLon"`
+	BottomRightLat float64 `json:"bottomRightLat"`
+}
+
+// GetTopLeftLon returns the value of TopLeftLon.
+func (s *DevelopmentSearchReqBoard) GetTopLeftLon() float64 {
+	return s.TopLeftLon
+}
+
+// GetTopLeftLat returns the value of TopLeftLat.
+func (s *DevelopmentSearchReqBoard) GetTopLeftLat() float64 {
+	return s.TopLeftLat
+}
+
+// GetBottomRightLon returns the value of BottomRightLon.
+func (s *DevelopmentSearchReqBoard) GetBottomRightLon() float64 {
+	return s.BottomRightLon
+}
+
+// GetBottomRightLat returns the value of BottomRightLat.
+func (s *DevelopmentSearchReqBoard) GetBottomRightLat() float64 {
+	return s.BottomRightLat
+}
+
+// SetTopLeftLon sets the value of TopLeftLon.
+func (s *DevelopmentSearchReqBoard) SetTopLeftLon(val float64) {
+	s.TopLeftLon = val
+}
+
+// SetTopLeftLat sets the value of TopLeftLat.
+func (s *DevelopmentSearchReqBoard) SetTopLeftLat(val float64) {
+	s.TopLeftLat = val
+}
+
+// SetBottomRightLon sets the value of BottomRightLon.
+func (s *DevelopmentSearchReqBoard) SetBottomRightLon(val float64) {
+	s.BottomRightLon = val
+}
+
+// SetBottomRightLat sets the value of BottomRightLat.
+func (s *DevelopmentSearchReqBoard) SetBottomRightLat(val float64) {
+	s.BottomRightLat = val
+}
+
+type DevelopmentSearchReqPagination struct {
+	Page    int `json:"page"`
+	PerPage int `json:"perPage"`
+}
+
+// GetPage returns the value of Page.
+func (s *DevelopmentSearchReqPagination) GetPage() int {
+	return s.Page
+}
+
+// GetPerPage returns the value of PerPage.
+func (s *DevelopmentSearchReqPagination) GetPerPage() int {
+	return s.PerPage
+}
+
+// SetPage sets the value of Page.
+func (s *DevelopmentSearchReqPagination) SetPage(val int) {
+	s.Page = val
+}
+
+// SetPerPage sets the value of PerPage.
+func (s *DevelopmentSearchReqPagination) SetPerPage(val int) {
+	s.PerPage = val
 }
 
 // Ref: #/components/schemas/error
 type Error struct {
-	Status OptErrorStatus `json:"status"`
+	Status ErrorStatus `json:"status"`
 	// Ошибка.
-	Error OptErrorError `json:"error"`
+	Error ErrorError `json:"error"`
 }
 
 // GetStatus returns the value of Status.
-func (s *Error) GetStatus() OptErrorStatus {
+func (s *Error) GetStatus() ErrorStatus {
 	return s.Status
 }
 
 // GetError returns the value of Error.
-func (s *Error) GetError() OptErrorError {
+func (s *Error) GetError() ErrorError {
 	return s.Error
 }
 
 // SetStatus sets the value of Status.
-func (s *Error) SetStatus(val OptErrorStatus) {
+func (s *Error) SetStatus(val ErrorStatus) {
 	s.Status = val
 }
 
 // SetError sets the value of Error.
-func (s *Error) SetError(val OptErrorError) {
+func (s *Error) SetError(val ErrorError) {
 	s.Error = val
 }
 
 // Ошибка.
 type ErrorError struct {
 	// Код ошибки.
-	Code OptInt `json:"code"`
+	Code int `json:"code"`
 	// Сообщение об ошибке.
-	Message OptString `json:"message"`
+	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *ErrorError) GetCode() OptInt {
+func (s *ErrorError) GetCode() int {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *ErrorError) GetMessage() OptString {
+func (s *ErrorError) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *ErrorError) SetCode(val OptInt) {
+func (s *ErrorError) SetCode(val int) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *ErrorError) SetMessage(val OptString) {
+func (s *ErrorError) SetMessage(val string) {
 	s.Message = val
 }
 
@@ -211,121 +383,126 @@ func (s *ErrorStatus) UnmarshalText(data []byte) error {
 	}
 }
 
-type ObjectsFindNearestInfrastructureBadRequest Error
+type InfrastructureRadiusBoardBadRequest Error
 
-func (*ObjectsFindNearestInfrastructureBadRequest) objectsFindNearestInfrastructureRes() {}
+func (*InfrastructureRadiusBoardBadRequest) infrastructureRadiusBoardRes() {}
 
-type ObjectsFindNearestInfrastructureInternalServerError Error
+type InfrastructureRadiusBoardInternalServerError Error
 
-func (*ObjectsFindNearestInfrastructureInternalServerError) objectsFindNearestInfrastructureRes() {}
+func (*InfrastructureRadiusBoardInternalServerError) infrastructureRadiusBoardRes() {}
 
-type ObjectsFindNearestInfrastructureOK map[string]jx.Raw
+type InfrastructureRadiusBoardNotFound Error
 
-func (s *ObjectsFindNearestInfrastructureOK) init() ObjectsFindNearestInfrastructureOK {
-	m := *s
-	if m == nil {
-		m = map[string]jx.Raw{}
-		*s = m
-	}
-	return m
+func (*InfrastructureRadiusBoardNotFound) infrastructureRadiusBoardRes() {}
+
+type InfrastructureRadiusBoardOKApplicationJSON []InfrastructureRadiusBoardOKItem
+
+func (*InfrastructureRadiusBoardOKApplicationJSON) infrastructureRadiusBoardRes() {}
+
+type InfrastructureRadiusBoardOKItem struct {
+	ID      int                                   `json:"id"`
+	Name    OptString                             `json:"name"`
+	ObjType string                                `json:"objType"`
+	Coords  InfrastructureRadiusBoardOKItemCoords `json:"coords"`
 }
 
-func (*ObjectsFindNearestInfrastructureOK) objectsFindNearestInfrastructureRes() {}
-
-type ObjectsFindNearestInfrastructureObjectTypesItem string
-
-const (
-	ObjectsFindNearestInfrastructureObjectTypesItemHospital     ObjectsFindNearestInfrastructureObjectTypesItem = "hospital"
-	ObjectsFindNearestInfrastructureObjectTypesItemSport        ObjectsFindNearestInfrastructureObjectTypesItem = "sport"
-	ObjectsFindNearestInfrastructureObjectTypesItemShops        ObjectsFindNearestInfrastructureObjectTypesItem = "shops"
-	ObjectsFindNearestInfrastructureObjectTypesItemKindergarten ObjectsFindNearestInfrastructureObjectTypesItem = "kindergarten"
-	ObjectsFindNearestInfrastructureObjectTypesItemBusStop      ObjectsFindNearestInfrastructureObjectTypesItem = "busStop"
-)
-
-// AllValues returns all ObjectsFindNearestInfrastructureObjectTypesItem values.
-func (ObjectsFindNearestInfrastructureObjectTypesItem) AllValues() []ObjectsFindNearestInfrastructureObjectTypesItem {
-	return []ObjectsFindNearestInfrastructureObjectTypesItem{
-		ObjectsFindNearestInfrastructureObjectTypesItemHospital,
-		ObjectsFindNearestInfrastructureObjectTypesItemSport,
-		ObjectsFindNearestInfrastructureObjectTypesItemShops,
-		ObjectsFindNearestInfrastructureObjectTypesItemKindergarten,
-		ObjectsFindNearestInfrastructureObjectTypesItemBusStop,
-	}
+// GetID returns the value of ID.
+func (s *InfrastructureRadiusBoardOKItem) GetID() int {
+	return s.ID
 }
 
-// MarshalText implements encoding.TextMarshaler.
-func (s ObjectsFindNearestInfrastructureObjectTypesItem) MarshalText() ([]byte, error) {
-	switch s {
-	case ObjectsFindNearestInfrastructureObjectTypesItemHospital:
-		return []byte(s), nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemSport:
-		return []byte(s), nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemShops:
-		return []byte(s), nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemKindergarten:
-		return []byte(s), nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemBusStop:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
+// GetName returns the value of Name.
+func (s *InfrastructureRadiusBoardOKItem) GetName() OptString {
+	return s.Name
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ObjectsFindNearestInfrastructureObjectTypesItem) UnmarshalText(data []byte) error {
-	switch ObjectsFindNearestInfrastructureObjectTypesItem(data) {
-	case ObjectsFindNearestInfrastructureObjectTypesItemHospital:
-		*s = ObjectsFindNearestInfrastructureObjectTypesItemHospital
-		return nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemSport:
-		*s = ObjectsFindNearestInfrastructureObjectTypesItemSport
-		return nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemShops:
-		*s = ObjectsFindNearestInfrastructureObjectTypesItemShops
-		return nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemKindergarten:
-		*s = ObjectsFindNearestInfrastructureObjectTypesItemKindergarten
-		return nil
-	case ObjectsFindNearestInfrastructureObjectTypesItemBusStop:
-		*s = ObjectsFindNearestInfrastructureObjectTypesItemBusStop
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
+// GetObjType returns the value of ObjType.
+func (s *InfrastructureRadiusBoardOKItem) GetObjType() string {
+	return s.ObjType
 }
 
-// NewOptDevelopmentSearchBoardOKItemCoords returns new OptDevelopmentSearchBoardOKItemCoords with value set to v.
-func NewOptDevelopmentSearchBoardOKItemCoords(v DevelopmentSearchBoardOKItemCoords) OptDevelopmentSearchBoardOKItemCoords {
-	return OptDevelopmentSearchBoardOKItemCoords{
+// GetCoords returns the value of Coords.
+func (s *InfrastructureRadiusBoardOKItem) GetCoords() InfrastructureRadiusBoardOKItemCoords {
+	return s.Coords
+}
+
+// SetID sets the value of ID.
+func (s *InfrastructureRadiusBoardOKItem) SetID(val int) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *InfrastructureRadiusBoardOKItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetObjType sets the value of ObjType.
+func (s *InfrastructureRadiusBoardOKItem) SetObjType(val string) {
+	s.ObjType = val
+}
+
+// SetCoords sets the value of Coords.
+func (s *InfrastructureRadiusBoardOKItem) SetCoords(val InfrastructureRadiusBoardOKItemCoords) {
+	s.Coords = val
+}
+
+type InfrastructureRadiusBoardOKItemCoords struct {
+	Lon float64 `json:"lon"`
+	Lat float64 `json:"lat"`
+}
+
+// GetLon returns the value of Lon.
+func (s *InfrastructureRadiusBoardOKItemCoords) GetLon() float64 {
+	return s.Lon
+}
+
+// GetLat returns the value of Lat.
+func (s *InfrastructureRadiusBoardOKItemCoords) GetLat() float64 {
+	return s.Lat
+}
+
+// SetLon sets the value of Lon.
+func (s *InfrastructureRadiusBoardOKItemCoords) SetLon(val float64) {
+	s.Lon = val
+}
+
+// SetLat sets the value of Lat.
+func (s *InfrastructureRadiusBoardOKItemCoords) SetLat(val float64) {
+	s.Lat = val
+}
+
+// NewOptDevelopmentSearchReqBoard returns new OptDevelopmentSearchReqBoard with value set to v.
+func NewOptDevelopmentSearchReqBoard(v DevelopmentSearchReqBoard) OptDevelopmentSearchReqBoard {
+	return OptDevelopmentSearchReqBoard{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptDevelopmentSearchBoardOKItemCoords is optional DevelopmentSearchBoardOKItemCoords.
-type OptDevelopmentSearchBoardOKItemCoords struct {
-	Value DevelopmentSearchBoardOKItemCoords
+// OptDevelopmentSearchReqBoard is optional DevelopmentSearchReqBoard.
+type OptDevelopmentSearchReqBoard struct {
+	Value DevelopmentSearchReqBoard
 	Set   bool
 }
 
-// IsSet returns true if OptDevelopmentSearchBoardOKItemCoords was set.
-func (o OptDevelopmentSearchBoardOKItemCoords) IsSet() bool { return o.Set }
+// IsSet returns true if OptDevelopmentSearchReqBoard was set.
+func (o OptDevelopmentSearchReqBoard) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptDevelopmentSearchBoardOKItemCoords) Reset() {
-	var v DevelopmentSearchBoardOKItemCoords
+func (o *OptDevelopmentSearchReqBoard) Reset() {
+	var v DevelopmentSearchReqBoard
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptDevelopmentSearchBoardOKItemCoords) SetTo(v DevelopmentSearchBoardOKItemCoords) {
+func (o *OptDevelopmentSearchReqBoard) SetTo(v DevelopmentSearchReqBoard) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptDevelopmentSearchBoardOKItemCoords) Get() (v DevelopmentSearchBoardOKItemCoords, ok bool) {
+func (o OptDevelopmentSearchReqBoard) Get() (v DevelopmentSearchReqBoard, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -333,45 +510,45 @@ func (o OptDevelopmentSearchBoardOKItemCoords) Get() (v DevelopmentSearchBoardOK
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptDevelopmentSearchBoardOKItemCoords) Or(d DevelopmentSearchBoardOKItemCoords) DevelopmentSearchBoardOKItemCoords {
+func (o OptDevelopmentSearchReqBoard) Or(d DevelopmentSearchReqBoard) DevelopmentSearchReqBoard {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptErrorError returns new OptErrorError with value set to v.
-func NewOptErrorError(v ErrorError) OptErrorError {
-	return OptErrorError{
+// NewOptDevelopmentSearchReqPagination returns new OptDevelopmentSearchReqPagination with value set to v.
+func NewOptDevelopmentSearchReqPagination(v DevelopmentSearchReqPagination) OptDevelopmentSearchReqPagination {
+	return OptDevelopmentSearchReqPagination{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptErrorError is optional ErrorError.
-type OptErrorError struct {
-	Value ErrorError
+// OptDevelopmentSearchReqPagination is optional DevelopmentSearchReqPagination.
+type OptDevelopmentSearchReqPagination struct {
+	Value DevelopmentSearchReqPagination
 	Set   bool
 }
 
-// IsSet returns true if OptErrorError was set.
-func (o OptErrorError) IsSet() bool { return o.Set }
+// IsSet returns true if OptDevelopmentSearchReqPagination was set.
+func (o OptDevelopmentSearchReqPagination) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptErrorError) Reset() {
-	var v ErrorError
+func (o *OptDevelopmentSearchReqPagination) Reset() {
+	var v DevelopmentSearchReqPagination
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptErrorError) SetTo(v ErrorError) {
+func (o *OptDevelopmentSearchReqPagination) SetTo(v DevelopmentSearchReqPagination) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptErrorError) Get() (v ErrorError, ok bool) {
+func (o OptDevelopmentSearchReqPagination) Get() (v DevelopmentSearchReqPagination, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -379,145 +556,7 @@ func (o OptErrorError) Get() (v ErrorError, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptErrorError) Or(d ErrorError) ErrorError {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptErrorStatus returns new OptErrorStatus with value set to v.
-func NewOptErrorStatus(v ErrorStatus) OptErrorStatus {
-	return OptErrorStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptErrorStatus is optional ErrorStatus.
-type OptErrorStatus struct {
-	Value ErrorStatus
-	Set   bool
-}
-
-// IsSet returns true if OptErrorStatus was set.
-func (o OptErrorStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptErrorStatus) Reset() {
-	var v ErrorStatus
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptErrorStatus) SetTo(v ErrorStatus) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptErrorStatus) Get() (v ErrorStatus, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptErrorStatus) Or(d ErrorStatus) ErrorStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptFloat64 returns new OptFloat64 with value set to v.
-func NewOptFloat64(v float64) OptFloat64 {
-	return OptFloat64{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptFloat64 is optional float64.
-type OptFloat64 struct {
-	Value float64
-	Set   bool
-}
-
-// IsSet returns true if OptFloat64 was set.
-func (o OptFloat64) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptFloat64) Reset() {
-	var v float64
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptFloat64) SetTo(v float64) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptFloat64) Get() (v float64, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptFloat64) Or(d float64) float64 {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt is optional int.
-type OptInt struct {
-	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
+func (o OptDevelopmentSearchReqPagination) Or(d DevelopmentSearchReqPagination) DevelopmentSearchReqPagination {
 	if v, ok := o.Get(); ok {
 		return v
 	}
