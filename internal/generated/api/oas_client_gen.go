@@ -38,6 +38,13 @@ type Invoker interface {
 	//
 	// POST /developments/search/filter
 	DevelopmentSearch(ctx context.Context, request *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// GenerateInfrastructureHeatmap invokes generateInfrastructureHeatmap operation.
+	//
+	// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
+	// bounding box.
+	//
+	// POST /infrastructure/heatmap
+	GenerateInfrastructureHeatmap(ctx context.Context, request *GenerateInfrastructureHeatmapReq) (GenerateInfrastructureHeatmapRes, error)
 	// InfrastructureRadiusBoard invokes infrastructureRadiusBoard operation.
 	//
 	// Search for infrastructure around the selected residential complex.
@@ -259,6 +266,82 @@ func (c *Client) sendDevelopmentSearch(ctx context.Context, request *Development
 
 	stage = "DecodeResponse"
 	result, err := decodeDevelopmentSearchResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GenerateInfrastructureHeatmap invokes generateInfrastructureHeatmap operation.
+//
+// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
+// bounding box.
+//
+// POST /infrastructure/heatmap
+func (c *Client) GenerateInfrastructureHeatmap(ctx context.Context, request *GenerateInfrastructureHeatmapReq) (GenerateInfrastructureHeatmapRes, error) {
+	res, err := c.sendGenerateInfrastructureHeatmap(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendGenerateInfrastructureHeatmap(ctx context.Context, request *GenerateInfrastructureHeatmapReq) (res GenerateInfrastructureHeatmapRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("generateInfrastructureHeatmap"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/infrastructure/heatmap"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GenerateInfrastructureHeatmapOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/infrastructure/heatmap"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeGenerateInfrastructureHeatmapRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGenerateInfrastructureHeatmapResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

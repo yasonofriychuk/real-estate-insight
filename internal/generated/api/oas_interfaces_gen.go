@@ -9,6 +9,10 @@ type DevelopmentSearchRes interface {
 	developmentSearchRes()
 }
 
+type GenerateInfrastructureHeatmapRes interface {
+	generateInfrastructureHeatmapRes()
+}
+
 type InfrastructureRadiusBoardRes interface {
 	infrastructureRadiusBoardRes()
 }

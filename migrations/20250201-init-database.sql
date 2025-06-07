@@ -1,8 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS hstore;
-
-SELECT PostGIS_Version();
-
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS osm_node (
     osm_id BIGINT PRIMARY KEY,
@@ -22,4 +20,37 @@ CREATE TABLE IF NOT EXISTS development (
     created_at timestamp default current_timestamp NOT NULL,
     updated_at timestamp default current_timestamp NOT NULL,
     deleted_at timestamp
+);
+
+CREATE TABLE IF NOT EXISTS location (
+    id BIGINT PRIMARY KEY,
+    region_id BIGINT references location(id),
+    country_id BIGINT references location(id),
+    name TEXT not null
+);
+
+CREATE TABLE IF NOT EXISTS profile (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT unique not null,
+    password_hash TEXT not null,
+
+    created_at timestamp default current_timestamp NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS selection (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_id uuid not null references profile(id),
+    name TEXT not null default '',
+    comment TEXT not null default '',
+    form jsonb default '{}'::jsonb,
+
+    created_at timestamp default current_timestamp NOT NULL,
+    updated_at timestamp default current_timestamp NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS favorite_selection_development (
+    development_id BIGINT not null references development(id),
+    selection_id uuid not null references selection(id),
+
+    primary key (selection_id, development_id)
 );

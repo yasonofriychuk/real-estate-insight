@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_heatmap"
 	"log/slog"
 	"net/http"
 	"os"
@@ -43,6 +44,7 @@ func main() {
 		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
 		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage),
 		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
+		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage),
 	}
 
 	server, err := api.NewServer(srv)
@@ -51,15 +53,23 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Оборачиваем в CORS
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+	}).Handler(server)
+
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", server))
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", corsHandler))
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 
 	log.WithContext(ctx).Info("server start")
 
 	if err := http.ListenAndServe(
 		fmt.Sprintf(":%s", cfg.HttpPort()),
-		cors.New(cors.Options{AllowedOrigins: []string{}}).Handler(mux),
+		cors.AllowAll().Handler(mux),
 	); err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to start server")
 		os.Exit(1)

@@ -85,7 +85,7 @@ func (h *BuildRoutesByPointsHandler) BuildRoutesByPoints(ctx context.Context, pa
 	featureCollection := geojson.NewFeatureCollection()
 	for _, route := range routes {
 		feature := geojson.NewLineStringFeature(route.Coordinates)
-		feature.SetProperty("distance", fmt.Sprintf("%.2f meters", route.Distance))
+		feature.SetProperty("distance", fmt.Sprintf("%.2f метров", route.Distance))
 		featureCollection.AddFeature(feature)
 	}
 

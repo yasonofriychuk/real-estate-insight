@@ -6,7 +6,8 @@ package api
 type OperationName = string
 
 const (
-	BuildRoutesByPointsOperation       OperationName = "BuildRoutesByPoints"
-	DevelopmentSearchOperation         OperationName = "DevelopmentSearch"
-	InfrastructureRadiusBoardOperation OperationName = "InfrastructureRadiusBoard"
+	BuildRoutesByPointsOperation           OperationName = "BuildRoutesByPoints"
+	DevelopmentSearchOperation             OperationName = "DevelopmentSearch"
+	GenerateInfrastructureHeatmapOperation OperationName = "GenerateInfrastructureHeatmap"
+	InfrastructureRadiusBoardOperation     OperationName = "InfrastructureRadiusBoard"
 )

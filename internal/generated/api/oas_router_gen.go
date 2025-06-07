@@ -49,7 +49,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		switch elem[0] {
 		case '/': // Prefix: "/"
-			origElem := elem
+
 			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
@@ -61,7 +61,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			switch elem[0] {
 			case 'd': // Prefix: "developments/search/filter"
-				origElem := elem
+
 				if l := len("developments/search/filter"); len(elem) >= l && elem[0:l] == "developments/search/filter" {
 					elem = elem[l:]
 				} else {
@@ -80,30 +80,62 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				elem = origElem
-			case 'i': // Prefix: "infrastructure/radius"
-				origElem := elem
-				if l := len("infrastructure/radius"); len(elem) >= l && elem[0:l] == "infrastructure/radius" {
+			case 'i': // Prefix: "infrastructure/"
+
+				if l := len("infrastructure/"); len(elem) >= l && elem[0:l] == "infrastructure/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					// Leaf node.
-					switch r.Method {
-					case "GET":
-						s.handleInfrastructureRadiusBoardRequest([0]string{}, elemIsEscaped, w, r)
-					default:
-						s.notAllowed(w, r, "GET")
+					break
+				}
+				switch elem[0] {
+				case 'h': // Prefix: "heatmap"
+
+					if l := len("heatmap"); len(elem) >= l && elem[0:l] == "heatmap" {
+						elem = elem[l:]
+					} else {
+						break
 					}
 
-					return
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleGenerateInfrastructureHeatmapRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+				case 'r': // Prefix: "radius"
+
+					if l := len("radius"); len(elem) >= l && elem[0:l] == "radius" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleInfrastructureRadiusBoardRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
 				}
 
-				elem = origElem
 			case 'r': // Prefix: "routes/build/points"
-				origElem := elem
+
 				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
 					elem = elem[l:]
 				} else {
@@ -122,10 +154,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				elem = origElem
 			}
 
-			elem = origElem
 		}
 	}
 	s.notFound(w, r)
@@ -207,7 +237,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 		}
 		switch elem[0] {
 		case '/': // Prefix: "/"
-			origElem := elem
+
 			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
@@ -219,7 +249,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			}
 			switch elem[0] {
 			case 'd': // Prefix: "developments/search/filter"
-				origElem := elem
+
 				if l := len("developments/search/filter"); len(elem) >= l && elem[0:l] == "developments/search/filter" {
 					elem = elem[l:]
 				} else {
@@ -242,34 +272,70 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 				}
 
-				elem = origElem
-			case 'i': // Prefix: "infrastructure/radius"
-				origElem := elem
-				if l := len("infrastructure/radius"); len(elem) >= l && elem[0:l] == "infrastructure/radius" {
+			case 'i': // Prefix: "infrastructure/"
+
+				if l := len("infrastructure/"); len(elem) >= l && elem[0:l] == "infrastructure/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					// Leaf node.
-					switch method {
-					case "GET":
-						r.name = InfrastructureRadiusBoardOperation
-						r.summary = "Search for infrastructure around the selected residential complex"
-						r.operationID = "infrastructureRadiusBoard"
-						r.pathPattern = "/infrastructure/radius"
-						r.args = args
-						r.count = 0
-						return r, true
-					default:
-						return
+					break
+				}
+				switch elem[0] {
+				case 'h': // Prefix: "heatmap"
+
+					if l := len("heatmap"); len(elem) >= l && elem[0:l] == "heatmap" {
+						elem = elem[l:]
+					} else {
+						break
 					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = GenerateInfrastructureHeatmapOperation
+							r.summary = "Generate heatmap of infrastructure"
+							r.operationID = "generateInfrastructureHeatmap"
+							r.pathPattern = "/infrastructure/heatmap"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+				case 'r': // Prefix: "radius"
+
+					if l := len("radius"); len(elem) >= l && elem[0:l] == "radius" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = InfrastructureRadiusBoardOperation
+							r.summary = "Search for infrastructure around the selected residential complex"
+							r.operationID = "infrastructureRadiusBoard"
+							r.pathPattern = "/infrastructure/radius"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
 				}
 
-				elem = origElem
 			case 'r': // Prefix: "routes/build/points"
-				origElem := elem
+
 				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
 					elem = elem[l:]
 				} else {
@@ -292,10 +358,8 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 				}
 
-				elem = origElem
 			}
 
-			elem = origElem
 		}
 	}
 	return r, false

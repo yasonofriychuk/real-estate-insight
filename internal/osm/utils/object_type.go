@@ -17,6 +17,9 @@ var tagsTypeMap = map[[2]string]osm.ObjType{
 
 	{"amenity", "kindergarten"}: osm.Kindergarten,
 
+	{"amenity", "school"}:     osm.School,
+	{"amenity", "university"}: osm.School,
+
 	{"amenity", "bus_stop"}:               osm.BusStop,
 	{"public_transport", "stop_position"}: osm.BusStop,
 	{"amenity", "station"}:                osm.BusStop,

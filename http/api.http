@@ -1,4 +1,4 @@
-@host = 127.0.0.1:8080/api/v1
+@host = 127.0.0.1:5001/api/v1
 @lonFrom=73.41071023568674
 @latFrom=61.239917163896365
 @latTo=61.2774852727745
@@ -20,3 +20,25 @@ GET {{host}}/development/search/board?
     bottomRightLat=61.25117104755381
 
 ###
+
+### Generate infrastructure heatmap
+POST {{host}}/infrastructure/heatmap
+Content-Type: application/json
+
+{
+  "bbox": {
+    "topLeftLon": 73.2,
+    "topLeftLat": 61.35,
+    "bottomRightLon": 73.55,
+    "bottomRightLat": 61.15
+  },
+  "cellSize": 500,
+  "weights": {
+    "hospital": 7,
+    "sport": 4,
+    "shops": 3,
+    "kindergarten": 6,
+    "bus_stop": 2,
+    "school": 9
+  }
+}

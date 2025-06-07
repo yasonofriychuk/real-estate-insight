@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	batchSize       = 10000
+	batchSize       = 15000
 	goroutinesCount = 2
 	filePath        = "osmfiles/RU.osm.pbf"
 )
@@ -60,6 +60,9 @@ func main() {
 			break
 		}
 		if len(utils.ObjectTypeByTags(node.Tags)) == 0 {
+			continue
+		}
+		if strings.TrimSpace(node.Tags["name"]) == "" {
 			continue
 		}
 

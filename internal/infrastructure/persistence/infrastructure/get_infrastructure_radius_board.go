@@ -23,6 +23,7 @@ func (s *Storage) InfrastructureRadiusBoard(ctx context.Context, id, radius int)
 				Where(squirrel.Eq{"id": id}),
 			radius,
 		)).
+		Where("name IS NOT NULL AND name != ''").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("sql build: %w", err)

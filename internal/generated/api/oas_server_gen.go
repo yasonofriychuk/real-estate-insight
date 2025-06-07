@@ -18,6 +18,13 @@ type Handler interface {
 	//
 	// POST /developments/search/filter
 	DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// GenerateInfrastructureHeatmap implements generateInfrastructureHeatmap operation.
+	//
+	// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
+	// bounding box.
+	//
+	// POST /infrastructure/heatmap
+	GenerateInfrastructureHeatmap(ctx context.Context, req *GenerateInfrastructureHeatmapReq) (GenerateInfrastructureHeatmapRes, error)
 	// InfrastructureRadiusBoard implements infrastructureRadiusBoard operation.
 	//
 	// Search for infrastructure around the selected residential complex.

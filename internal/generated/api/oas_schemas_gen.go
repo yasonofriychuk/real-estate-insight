@@ -39,6 +39,7 @@ type Development struct {
 	Coords      DevelopmentCoords `json:"coords"`
 	ImageUrl    string            `json:"imageUrl"`
 	Description string            `json:"description"`
+	IsFavorite  OptBool           `json:"isFavorite"`
 }
 
 // GetID returns the value of ID.
@@ -66,6 +67,11 @@ func (s *Development) GetDescription() string {
 	return s.Description
 }
 
+// GetIsFavorite returns the value of IsFavorite.
+func (s *Development) GetIsFavorite() OptBool {
+	return s.IsFavorite
+}
+
 // SetID sets the value of ID.
 func (s *Development) SetID(val int64) {
 	s.ID = val
@@ -89,6 +95,11 @@ func (s *Development) SetImageUrl(val string) {
 // SetDescription sets the value of Description.
 func (s *Development) SetDescription(val string) {
 	s.Description = val
+}
+
+// SetIsFavorite sets the value of IsFavorite.
+func (s *Development) SetIsFavorite(val OptBool) {
+	s.IsFavorite = val
 }
 
 type DevelopmentCoords struct {
@@ -383,6 +394,128 @@ func (s *ErrorStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type GenerateInfrastructureHeatmapBadRequest Error
+
+func (*GenerateInfrastructureHeatmapBadRequest) generateInfrastructureHeatmapRes() {}
+
+type GenerateInfrastructureHeatmapInternalServerError Error
+
+func (*GenerateInfrastructureHeatmapInternalServerError) generateInfrastructureHeatmapRes() {}
+
+type GenerateInfrastructureHeatmapOKApplicationJSON []GenerateInfrastructureHeatmapOKItem
+
+func (*GenerateInfrastructureHeatmapOKApplicationJSON) generateInfrastructureHeatmapRes() {}
+
+type GenerateInfrastructureHeatmapOKItem struct {
+	Geometry GenerateInfrastructureHeatmapOKItemGeometry `json:"geometry"`
+	// Суммарный вес инфраструктуры в ячейке.
+	TotalWeight float64 `json:"total_weight"`
+}
+
+// GetGeometry returns the value of Geometry.
+func (s *GenerateInfrastructureHeatmapOKItem) GetGeometry() GenerateInfrastructureHeatmapOKItemGeometry {
+	return s.Geometry
+}
+
+// GetTotalWeight returns the value of TotalWeight.
+func (s *GenerateInfrastructureHeatmapOKItem) GetTotalWeight() float64 {
+	return s.TotalWeight
+}
+
+// SetGeometry sets the value of Geometry.
+func (s *GenerateInfrastructureHeatmapOKItem) SetGeometry(val GenerateInfrastructureHeatmapOKItemGeometry) {
+	s.Geometry = val
+}
+
+// SetTotalWeight sets the value of TotalWeight.
+func (s *GenerateInfrastructureHeatmapOKItem) SetTotalWeight(val float64) {
+	s.TotalWeight = val
+}
+
+type GenerateInfrastructureHeatmapOKItemGeometry map[string]jx.Raw
+
+func (s *GenerateInfrastructureHeatmapOKItemGeometry) init() GenerateInfrastructureHeatmapOKItemGeometry {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type GenerateInfrastructureHeatmapReq struct {
+	Bbox GenerateInfrastructureHeatmapReqBbox `json:"bbox"`
+	// Размер ячейки в метрах.
+	CellSize OptInt `json:"cellSize"`
+}
+
+// GetBbox returns the value of Bbox.
+func (s *GenerateInfrastructureHeatmapReq) GetBbox() GenerateInfrastructureHeatmapReqBbox {
+	return s.Bbox
+}
+
+// GetCellSize returns the value of CellSize.
+func (s *GenerateInfrastructureHeatmapReq) GetCellSize() OptInt {
+	return s.CellSize
+}
+
+// SetBbox sets the value of Bbox.
+func (s *GenerateInfrastructureHeatmapReq) SetBbox(val GenerateInfrastructureHeatmapReqBbox) {
+	s.Bbox = val
+}
+
+// SetCellSize sets the value of CellSize.
+func (s *GenerateInfrastructureHeatmapReq) SetCellSize(val OptInt) {
+	s.CellSize = val
+}
+
+type GenerateInfrastructureHeatmapReqBbox struct {
+	TopLeftLon     float64 `json:"topLeftLon"`
+	TopLeftLat     float64 `json:"topLeftLat"`
+	BottomRightLon float64 `json:"bottomRightLon"`
+	BottomRightLat float64 `json:"bottomRightLat"`
+}
+
+// GetTopLeftLon returns the value of TopLeftLon.
+func (s *GenerateInfrastructureHeatmapReqBbox) GetTopLeftLon() float64 {
+	return s.TopLeftLon
+}
+
+// GetTopLeftLat returns the value of TopLeftLat.
+func (s *GenerateInfrastructureHeatmapReqBbox) GetTopLeftLat() float64 {
+	return s.TopLeftLat
+}
+
+// GetBottomRightLon returns the value of BottomRightLon.
+func (s *GenerateInfrastructureHeatmapReqBbox) GetBottomRightLon() float64 {
+	return s.BottomRightLon
+}
+
+// GetBottomRightLat returns the value of BottomRightLat.
+func (s *GenerateInfrastructureHeatmapReqBbox) GetBottomRightLat() float64 {
+	return s.BottomRightLat
+}
+
+// SetTopLeftLon sets the value of TopLeftLon.
+func (s *GenerateInfrastructureHeatmapReqBbox) SetTopLeftLon(val float64) {
+	s.TopLeftLon = val
+}
+
+// SetTopLeftLat sets the value of TopLeftLat.
+func (s *GenerateInfrastructureHeatmapReqBbox) SetTopLeftLat(val float64) {
+	s.TopLeftLat = val
+}
+
+// SetBottomRightLon sets the value of BottomRightLon.
+func (s *GenerateInfrastructureHeatmapReqBbox) SetBottomRightLon(val float64) {
+	s.BottomRightLon = val
+}
+
+// SetBottomRightLat sets the value of BottomRightLat.
+func (s *GenerateInfrastructureHeatmapReqBbox) SetBottomRightLat(val float64) {
+	s.BottomRightLat = val
+}
+
 type InfrastructureRadiusBoardBadRequest Error
 
 func (*InfrastructureRadiusBoardBadRequest) infrastructureRadiusBoardRes() {}
@@ -471,6 +604,52 @@ func (s *InfrastructureRadiusBoardOKItemCoords) SetLat(val float64) {
 	s.Lat = val
 }
 
+// NewOptBool returns new OptBool with value set to v.
+func NewOptBool(v bool) OptBool {
+	return OptBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBool is optional bool.
+type OptBool struct {
+	Value bool
+	Set   bool
+}
+
+// IsSet returns true if OptBool was set.
+func (o OptBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBool) SetTo(v bool) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBool) Get() (v bool, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptDevelopmentSearchReqBoard returns new OptDevelopmentSearchReqBoard with value set to v.
 func NewOptDevelopmentSearchReqBoard(v DevelopmentSearchReqBoard) OptDevelopmentSearchReqBoard {
 	return OptDevelopmentSearchReqBoard{
@@ -557,6 +736,52 @@ func (o OptDevelopmentSearchReqPagination) Get() (v DevelopmentSearchReqPaginati
 
 // Or returns value if set, or given parameter if does not.
 func (o OptDevelopmentSearchReqPagination) Or(d DevelopmentSearchReqPagination) DevelopmentSearchReqPagination {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
 	if v, ok := o.Get(); ok {
 		return v
 	}

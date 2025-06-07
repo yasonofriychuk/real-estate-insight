@@ -66,7 +66,7 @@ func decodeBuildRoutesByPointsParams(args [0]string, argsEscaped bool, r *http.R
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -102,7 +102,7 @@ func decodeBuildRoutesByPointsParams(args [0]string, argsEscaped bool, r *http.R
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -184,7 +184,7 @@ func decodeInfrastructureRadiusBoardParams(args [0]string, argsEscaped bool, r *
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -237,7 +237,7 @@ func decodeInfrastructureRadiusBoardParams(args [0]string, argsEscaped bool, r *
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {

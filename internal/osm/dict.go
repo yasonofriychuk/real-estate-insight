@@ -8,6 +8,7 @@ const (
 	Shops        ObjType = "shops"
 	Kindergarten ObjType = "kindergarten"
 	BusStop      ObjType = "bus_stop"
+	School       ObjType = "school"
 )
 
 var (

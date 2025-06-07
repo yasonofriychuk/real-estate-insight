@@ -72,6 +72,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /infrastructure/heatmap:
+    post:
+      summary: Generate heatmap of infrastructure
+      description: Returns a grid-based heatmap for infrastructure objects based on type weights within a selected bounding box
+      operationId: generateInfrastructureHeatmap
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bbox
+              properties:
+                bbox:
+                  type: object
+                  required:
+                    - topLeftLon
+                    - topLeftLat
+                    - bottomRightLon
+                    - bottomRightLat
+                  properties:
+                    topLeftLon:
+                      type: number
+                    topLeftLat:
+                      type: number
+                    bottomRightLon:
+                      type: number
+                    bottomRightLat:
+                      type: number
+      responses:
+        200:
+          description: Successful heatmap generation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - geometry
+                    - total_weight
+                  properties:
+                    geometry:
+                      type: object
+                      additionalProperties: true # GeoJson
+                    total_weight:
+                      type: number
+                      description: Суммарный вес инфраструктуры в ячейке
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
   /developments/search/filter:
     post:
       operationId: developmentSearch
@@ -193,6 +254,244 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /selection/save:
+    post:
+      summary: Create a new selection
+      description: Create a new selection for the user with name, comment, and form.
+      operationId: createSelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - selection_id
+                - name
+                - comment
+                - form
+              properties:
+                selection_id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                comment:
+                  type: string
+                form:
+                  type: object
+                  required:
+                    - location_id
+                    - w_bus_stop
+                    - w_hospital
+                    - w_kindergarten
+                    - w_school
+                    - w_shop
+                    - w_sport
+                  properties:
+                    location_id:
+                      type: integer
+                    w_hospital:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+                    w_sport:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+                    w_shop:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+                    w_kindergarten:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+                    w_bus_stop:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+                    w_school:
+                      type: integer
+                      minimum: 0
+                      maximum: 10
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: boolean
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /selection/delete:
+    post:
+      summary: Delete a selection
+      description: Delete a selection for the user by selection ID.
+      operationId: deleteSelection
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: boolean
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /selection/favorite:
+    post:
+      summary: Add/remove a development to/from favorites
+      description: Add or remove a development to/from the selected user's favorite selection.
+      operationId: addToFavoriteSelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - selection_id
+                - development_id
+              properties:
+                selection_id:
+                  type: string
+                  format: uuid
+                development_id:
+                  type: integer
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: boolean
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /profile/login:
+    post:
+      summary: User login
+      description: Authenticate the user using email and password.
+      operationId: userLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        200:
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - profile_id
+                  - token
+                properties:
+                  profile_id:
+                    type: string
+                    format: uuid
+                  token:
+                    type: string
+                    description: JWT authentication token
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
 
 components:
   schemas:
@@ -224,6 +523,8 @@ components:
           type: string
         description:
           type: string
+        isFavorite:
+          type: boolean
     error:
       type: object
       required:

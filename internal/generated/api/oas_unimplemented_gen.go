@@ -29,6 +29,16 @@ func (UnimplementedHandler) DevelopmentSearch(ctx context.Context, req *Developm
 	return r, ht.ErrNotImplemented
 }
 
+// GenerateInfrastructureHeatmap implements generateInfrastructureHeatmap operation.
+//
+// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
+// bounding box.
+//
+// POST /infrastructure/heatmap
+func (UnimplementedHandler) GenerateInfrastructureHeatmap(ctx context.Context, req *GenerateInfrastructureHeatmapReq) (r GenerateInfrastructureHeatmapRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // InfrastructureRadiusBoard implements infrastructureRadiusBoard operation.
 //
 // Search for infrastructure around the selected residential complex.
