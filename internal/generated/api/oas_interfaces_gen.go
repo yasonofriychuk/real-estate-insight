@@ -21,12 +21,24 @@ type DevelopmentSearchRes interface {
 	developmentSearchRes()
 }
 
+type EditSelectionRes interface {
+	editSelectionRes()
+}
+
 type GenerateInfrastructureHeatmapRes interface {
 	generateInfrastructureHeatmapRes()
 }
 
 type InfrastructureRadiusBoardRes interface {
 	infrastructureRadiusBoardRes()
+}
+
+type LocationListRes interface {
+	locationListRes()
+}
+
+type SelectionListRes interface {
+	selectionListRes()
 }
 
 type UserLoginRes interface {

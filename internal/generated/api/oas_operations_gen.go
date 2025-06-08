@@ -11,7 +11,10 @@ const (
 	CreateSelectionOperation               OperationName = "CreateSelection"
 	DeleteSelectionOperation               OperationName = "DeleteSelection"
 	DevelopmentSearchOperation             OperationName = "DevelopmentSearch"
+	EditSelectionOperation                 OperationName = "EditSelection"
 	GenerateInfrastructureHeatmapOperation OperationName = "GenerateInfrastructureHeatmap"
 	InfrastructureRadiusBoardOperation     OperationName = "InfrastructureRadiusBoard"
+	LocationListOperation                  OperationName = "LocationList"
+	SelectionListOperation                 OperationName = "SelectionList"
 	UserLoginOperation                     OperationName = "UserLogin"
 )

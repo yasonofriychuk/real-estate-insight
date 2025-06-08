@@ -3,6 +3,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 	"github.com/google/uuid"
@@ -95,31 +97,25 @@ type CreateSelectionInternalServerError Error
 func (*CreateSelectionInternalServerError) createSelectionRes() {}
 
 type CreateSelectionOK struct {
-	Status bool `json:"status"`
+	SelectionId uuid.UUID `json:"selectionId"`
 }
 
-// GetStatus returns the value of Status.
-func (s *CreateSelectionOK) GetStatus() bool {
-	return s.Status
+// GetSelectionId returns the value of SelectionId.
+func (s *CreateSelectionOK) GetSelectionId() uuid.UUID {
+	return s.SelectionId
 }
 
-// SetStatus sets the value of Status.
-func (s *CreateSelectionOK) SetStatus(val bool) {
-	s.Status = val
+// SetSelectionId sets the value of SelectionId.
+func (s *CreateSelectionOK) SetSelectionId(val uuid.UUID) {
+	s.SelectionId = val
 }
 
 func (*CreateSelectionOK) createSelectionRes() {}
 
 type CreateSelectionReq struct {
-	SelectionID uuid.UUID              `json:"selection_id"`
-	Name        string                 `json:"name"`
-	Comment     string                 `json:"comment"`
-	Form        CreateSelectionReqForm `json:"form"`
-}
-
-// GetSelectionID returns the value of SelectionID.
-func (s *CreateSelectionReq) GetSelectionID() uuid.UUID {
-	return s.SelectionID
+	Name    string        `json:"name"`
+	Comment string        `json:"comment"`
+	Form    SelectionForm `json:"form"`
 }
 
 // GetName returns the value of Name.
@@ -133,13 +129,8 @@ func (s *CreateSelectionReq) GetComment() string {
 }
 
 // GetForm returns the value of Form.
-func (s *CreateSelectionReq) GetForm() CreateSelectionReqForm {
+func (s *CreateSelectionReq) GetForm() SelectionForm {
 	return s.Form
-}
-
-// SetSelectionID sets the value of SelectionID.
-func (s *CreateSelectionReq) SetSelectionID(val uuid.UUID) {
-	s.SelectionID = val
 }
 
 // SetName sets the value of Name.
@@ -153,88 +144,8 @@ func (s *CreateSelectionReq) SetComment(val string) {
 }
 
 // SetForm sets the value of Form.
-func (s *CreateSelectionReq) SetForm(val CreateSelectionReqForm) {
+func (s *CreateSelectionReq) SetForm(val SelectionForm) {
 	s.Form = val
-}
-
-type CreateSelectionReqForm struct {
-	LocationID    int `json:"location_id"`
-	WHospital     int `json:"w_hospital"`
-	WSport        int `json:"w_sport"`
-	WShop         int `json:"w_shop"`
-	WKindergarten int `json:"w_kindergarten"`
-	WBusStop      int `json:"w_bus_stop"`
-	WSchool       int `json:"w_school"`
-}
-
-// GetLocationID returns the value of LocationID.
-func (s *CreateSelectionReqForm) GetLocationID() int {
-	return s.LocationID
-}
-
-// GetWHospital returns the value of WHospital.
-func (s *CreateSelectionReqForm) GetWHospital() int {
-	return s.WHospital
-}
-
-// GetWSport returns the value of WSport.
-func (s *CreateSelectionReqForm) GetWSport() int {
-	return s.WSport
-}
-
-// GetWShop returns the value of WShop.
-func (s *CreateSelectionReqForm) GetWShop() int {
-	return s.WShop
-}
-
-// GetWKindergarten returns the value of WKindergarten.
-func (s *CreateSelectionReqForm) GetWKindergarten() int {
-	return s.WKindergarten
-}
-
-// GetWBusStop returns the value of WBusStop.
-func (s *CreateSelectionReqForm) GetWBusStop() int {
-	return s.WBusStop
-}
-
-// GetWSchool returns the value of WSchool.
-func (s *CreateSelectionReqForm) GetWSchool() int {
-	return s.WSchool
-}
-
-// SetLocationID sets the value of LocationID.
-func (s *CreateSelectionReqForm) SetLocationID(val int) {
-	s.LocationID = val
-}
-
-// SetWHospital sets the value of WHospital.
-func (s *CreateSelectionReqForm) SetWHospital(val int) {
-	s.WHospital = val
-}
-
-// SetWSport sets the value of WSport.
-func (s *CreateSelectionReqForm) SetWSport(val int) {
-	s.WSport = val
-}
-
-// SetWShop sets the value of WShop.
-func (s *CreateSelectionReqForm) SetWShop(val int) {
-	s.WShop = val
-}
-
-// SetWKindergarten sets the value of WKindergarten.
-func (s *CreateSelectionReqForm) SetWKindergarten(val int) {
-	s.WKindergarten = val
-}
-
-// SetWBusStop sets the value of WBusStop.
-func (s *CreateSelectionReqForm) SetWBusStop(val int) {
-	s.WBusStop = val
-}
-
-// SetWSchool sets the value of WSchool.
-func (s *CreateSelectionReqForm) SetWSchool(val int) {
-	s.WSchool = val
 }
 
 type CreateSelectionUnauthorized Error
@@ -520,6 +431,85 @@ func (s *DevelopmentSearchReqPagination) SetPage(val int) {
 func (s *DevelopmentSearchReqPagination) SetPerPage(val int) {
 	s.PerPage = val
 }
+
+type EditSelectionBadRequest Error
+
+func (*EditSelectionBadRequest) editSelectionRes() {}
+
+type EditSelectionInternalServerError Error
+
+func (*EditSelectionInternalServerError) editSelectionRes() {}
+
+type EditSelectionNotFound Error
+
+func (*EditSelectionNotFound) editSelectionRes() {}
+
+type EditSelectionOK struct {
+	Status bool `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *EditSelectionOK) GetStatus() bool {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *EditSelectionOK) SetStatus(val bool) {
+	s.Status = val
+}
+
+func (*EditSelectionOK) editSelectionRes() {}
+
+type EditSelectionReq struct {
+	SelectionId uuid.UUID     `json:"selectionId"`
+	Name        string        `json:"name"`
+	Comment     string        `json:"comment"`
+	Form        SelectionForm `json:"form"`
+}
+
+// GetSelectionId returns the value of SelectionId.
+func (s *EditSelectionReq) GetSelectionId() uuid.UUID {
+	return s.SelectionId
+}
+
+// GetName returns the value of Name.
+func (s *EditSelectionReq) GetName() string {
+	return s.Name
+}
+
+// GetComment returns the value of Comment.
+func (s *EditSelectionReq) GetComment() string {
+	return s.Comment
+}
+
+// GetForm returns the value of Form.
+func (s *EditSelectionReq) GetForm() SelectionForm {
+	return s.Form
+}
+
+// SetSelectionId sets the value of SelectionId.
+func (s *EditSelectionReq) SetSelectionId(val uuid.UUID) {
+	s.SelectionId = val
+}
+
+// SetName sets the value of Name.
+func (s *EditSelectionReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetComment sets the value of Comment.
+func (s *EditSelectionReq) SetComment(val string) {
+	s.Comment = val
+}
+
+// SetForm sets the value of Form.
+func (s *EditSelectionReq) SetForm(val SelectionForm) {
+	s.Form = val
+}
+
+type EditSelectionUnauthorized Error
+
+func (*EditSelectionUnauthorized) editSelectionRes() {}
 
 // Ref: #/components/schemas/error
 type Error struct {
@@ -829,6 +819,59 @@ func (s *InfrastructureRadiusBoardOKItemCoords) SetLat(val float64) {
 	s.Lat = val
 }
 
+type LocationListBadRequest Error
+
+func (*LocationListBadRequest) locationListRes() {}
+
+type LocationListInternalServerError Error
+
+func (*LocationListInternalServerError) locationListRes() {}
+
+type LocationListOK struct {
+	Locations []LocationListOKLocationsItem `json:"locations"`
+}
+
+// GetLocations returns the value of Locations.
+func (s *LocationListOK) GetLocations() []LocationListOKLocationsItem {
+	return s.Locations
+}
+
+// SetLocations sets the value of Locations.
+func (s *LocationListOK) SetLocations(val []LocationListOKLocationsItem) {
+	s.Locations = val
+}
+
+func (*LocationListOK) locationListRes() {}
+
+type LocationListOKLocationsItem struct {
+	LocationId int    `json:"locationId"`
+	Name       string `json:"name"`
+}
+
+// GetLocationId returns the value of LocationId.
+func (s *LocationListOKLocationsItem) GetLocationId() int {
+	return s.LocationId
+}
+
+// GetName returns the value of Name.
+func (s *LocationListOKLocationsItem) GetName() string {
+	return s.Name
+}
+
+// SetLocationId sets the value of LocationId.
+func (s *LocationListOKLocationsItem) SetLocationId(val int) {
+	s.LocationId = val
+}
+
+// SetName sets the value of Name.
+func (s *LocationListOKLocationsItem) SetName(val string) {
+	s.Name = val
+}
+
+type LocationListUnauthorized Error
+
+func (*LocationListUnauthorized) locationListRes() {}
+
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
 	return OptBool{
@@ -1012,6 +1055,184 @@ func (o OptString) Or(d string) string {
 	}
 	return d
 }
+
+// Ref: #/components/schemas/selectionForm
+type SelectionForm struct {
+	LocationID    int `json:"location_id"`
+	WHospital     int `json:"w_hospital"`
+	WSport        int `json:"w_sport"`
+	WShop         int `json:"w_shop"`
+	WKindergarten int `json:"w_kindergarten"`
+	WBusStop      int `json:"w_bus_stop"`
+	WSchool       int `json:"w_school"`
+}
+
+// GetLocationID returns the value of LocationID.
+func (s *SelectionForm) GetLocationID() int {
+	return s.LocationID
+}
+
+// GetWHospital returns the value of WHospital.
+func (s *SelectionForm) GetWHospital() int {
+	return s.WHospital
+}
+
+// GetWSport returns the value of WSport.
+func (s *SelectionForm) GetWSport() int {
+	return s.WSport
+}
+
+// GetWShop returns the value of WShop.
+func (s *SelectionForm) GetWShop() int {
+	return s.WShop
+}
+
+// GetWKindergarten returns the value of WKindergarten.
+func (s *SelectionForm) GetWKindergarten() int {
+	return s.WKindergarten
+}
+
+// GetWBusStop returns the value of WBusStop.
+func (s *SelectionForm) GetWBusStop() int {
+	return s.WBusStop
+}
+
+// GetWSchool returns the value of WSchool.
+func (s *SelectionForm) GetWSchool() int {
+	return s.WSchool
+}
+
+// SetLocationID sets the value of LocationID.
+func (s *SelectionForm) SetLocationID(val int) {
+	s.LocationID = val
+}
+
+// SetWHospital sets the value of WHospital.
+func (s *SelectionForm) SetWHospital(val int) {
+	s.WHospital = val
+}
+
+// SetWSport sets the value of WSport.
+func (s *SelectionForm) SetWSport(val int) {
+	s.WSport = val
+}
+
+// SetWShop sets the value of WShop.
+func (s *SelectionForm) SetWShop(val int) {
+	s.WShop = val
+}
+
+// SetWKindergarten sets the value of WKindergarten.
+func (s *SelectionForm) SetWKindergarten(val int) {
+	s.WKindergarten = val
+}
+
+// SetWBusStop sets the value of WBusStop.
+func (s *SelectionForm) SetWBusStop(val int) {
+	s.WBusStop = val
+}
+
+// SetWSchool sets the value of WSchool.
+func (s *SelectionForm) SetWSchool(val int) {
+	s.WSchool = val
+}
+
+type SelectionListBadRequest Error
+
+func (*SelectionListBadRequest) selectionListRes() {}
+
+type SelectionListInternalServerError Error
+
+func (*SelectionListInternalServerError) selectionListRes() {}
+
+type SelectionListOK struct {
+	Selections []SelectionListOKSelectionsItem `json:"selections"`
+}
+
+// GetSelections returns the value of Selections.
+func (s *SelectionListOK) GetSelections() []SelectionListOKSelectionsItem {
+	return s.Selections
+}
+
+// SetSelections sets the value of Selections.
+func (s *SelectionListOK) SetSelections(val []SelectionListOKSelectionsItem) {
+	s.Selections = val
+}
+
+func (*SelectionListOK) selectionListRes() {}
+
+type SelectionListOKSelectionsItem struct {
+	SelectionId uuid.UUID     `json:"selectionId"`
+	Name        string        `json:"name"`
+	Comment     string        `json:"comment"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	UpdatedAt   time.Time     `json:"updatedAt"`
+	Form        SelectionForm `json:"form"`
+}
+
+// GetSelectionId returns the value of SelectionId.
+func (s *SelectionListOKSelectionsItem) GetSelectionId() uuid.UUID {
+	return s.SelectionId
+}
+
+// GetName returns the value of Name.
+func (s *SelectionListOKSelectionsItem) GetName() string {
+	return s.Name
+}
+
+// GetComment returns the value of Comment.
+func (s *SelectionListOKSelectionsItem) GetComment() string {
+	return s.Comment
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *SelectionListOKSelectionsItem) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *SelectionListOKSelectionsItem) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetForm returns the value of Form.
+func (s *SelectionListOKSelectionsItem) GetForm() SelectionForm {
+	return s.Form
+}
+
+// SetSelectionId sets the value of SelectionId.
+func (s *SelectionListOKSelectionsItem) SetSelectionId(val uuid.UUID) {
+	s.SelectionId = val
+}
+
+// SetName sets the value of Name.
+func (s *SelectionListOKSelectionsItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetComment sets the value of Comment.
+func (s *SelectionListOKSelectionsItem) SetComment(val string) {
+	s.Comment = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *SelectionListOKSelectionsItem) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *SelectionListOKSelectionsItem) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetForm sets the value of Form.
+func (s *SelectionListOKSelectionsItem) SetForm(val SelectionForm) {
+	s.Form = val
+}
+
+type SelectionListUnauthorized Error
+
+func (*SelectionListUnauthorized) selectionListRes() {}
 
 type UserLoginBadRequest Error
 

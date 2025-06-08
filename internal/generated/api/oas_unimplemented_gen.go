@@ -35,7 +35,7 @@ func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params Buil
 //
 // Create a new selection for the user with name, comment, and form.
 //
-// POST /selection/save
+// POST /selection/create
 func (UnimplementedHandler) CreateSelection(ctx context.Context, req *CreateSelectionReq) (r CreateSelectionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -56,6 +56,15 @@ func (UnimplementedHandler) DevelopmentSearch(ctx context.Context, req *Developm
 	return r, ht.ErrNotImplemented
 }
 
+// EditSelection implements editSelection operation.
+//
+// Edit new selection.
+//
+// POST /selection/edit
+func (UnimplementedHandler) EditSelection(ctx context.Context, req *EditSelectionReq) (r EditSelectionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GenerateInfrastructureHeatmap implements generateInfrastructureHeatmap operation.
 //
 // Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
@@ -72,6 +81,24 @@ func (UnimplementedHandler) GenerateInfrastructureHeatmap(ctx context.Context, r
 //
 // GET /infrastructure/radius
 func (UnimplementedHandler) InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (r InfrastructureRadiusBoardRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// LocationList implements locationList operation.
+//
+// Get location list.
+//
+// GET /location/list
+func (UnimplementedHandler) LocationList(ctx context.Context) (r LocationListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SelectionList implements selectionList operation.
+//
+// Get selection list.
+//
+// GET /selection/list
+func (UnimplementedHandler) SelectionList(ctx context.Context) (r SelectionListRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

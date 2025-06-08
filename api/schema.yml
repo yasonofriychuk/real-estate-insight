@@ -254,7 +254,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-  /selection/save:
+  /selection/list:
+    get:
+      summary: Get selection list
+      description: Get selection list
+      operationId: selectionList
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - selections
+                properties:
+                  selections:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - selectionId
+                        - name
+                        - comment
+                        - createdAt
+                        - updatedAt
+                        - form
+                      properties:
+                        selectionId:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        comment:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                        form:
+                          $ref: "#/components/schemas/selectionForm"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /selection/create:
     post:
       summary: Create a new selection
       description: Create a new selection for the user with name, comment, and form.
@@ -266,55 +326,16 @@ paths:
             schema:
               type: object
               required:
-                - selection_id
                 - name
                 - comment
                 - form
               properties:
-                selection_id:
-                  type: string
-                  format: uuid
                 name:
                   type: string
                 comment:
                   type: string
                 form:
-                  type: object
-                  required:
-                    - location_id
-                    - w_bus_stop
-                    - w_hospital
-                    - w_kindergarten
-                    - w_school
-                    - w_shop
-                    - w_sport
-                  properties:
-                    location_id:
-                      type: integer
-                    w_hospital:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
-                    w_sport:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
-                    w_shop:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
-                    w_kindergarten:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
-                    w_bus_stop:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
-                    w_school:
-                      type: integer
-                      minimum: 0
-                      maximum: 10
+                  $ref: "#/components/schemas/selectionForm"
       responses:
         200:
           description: Successful operation
@@ -323,10 +344,11 @@ paths:
               schema:
                 type: object
                 required:
-                  - status
+                  - selectionId
                 properties:
-                  status:
-                    type: boolean
+                  selectionId:
+                    type: string
+                    format: uuid
         400:
           description: Bad request
           content:
@@ -377,6 +399,68 @@ paths:
                 $ref: "#/components/schemas/error"
         401:
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /selection/edit:
+    post:
+      summary: Edit new selection
+      description: Edit new selection
+      operationId: editSelection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - selectionId
+                - name
+                - comment
+                - form
+              properties:
+                selectionId:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                comment:
+                  type: string
+                form:
+                  $ref: "#/components/schemas/selectionForm"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: boolean
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: NotFount
           content:
             application/json:
               schema:
@@ -492,7 +576,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-
+  /location/list:
+    get:
+      summary: Get location list
+      description: Get location list
+      operationId: locationList
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - locations
+                properties:
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - locationId
+                        - name
+                      properties:
+                        locationId:
+                          type: integer
+                        name:
+                          type: string
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
 components:
   schemas:
     development:
@@ -525,6 +653,43 @@ components:
           type: string
         isFavorite:
           type: boolean
+    selectionForm:
+      type: object
+      required:
+        - location_id
+        - w_bus_stop
+        - w_hospital
+        - w_kindergarten
+        - w_school
+        - w_shop
+        - w_sport
+      properties:
+        location_id:
+          type: integer
+        w_hospital:
+          type: integer
+          minimum: 0
+          maximum: 10
+        w_sport:
+          type: integer
+          minimum: 0
+          maximum: 10
+        w_shop:
+          type: integer
+          minimum: 0
+          maximum: 10
+        w_kindergarten:
+          type: integer
+          minimum: 0
+          maximum: 10
+        w_bus_stop:
+          type: integer
+          minimum: 0
+          maximum: 10
+        w_school:
+          type: integer
+          minimum: 0
+          maximum: 10
     error:
       type: object
       required:

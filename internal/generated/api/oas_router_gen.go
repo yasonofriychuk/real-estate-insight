@@ -134,6 +134,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				}
 
+			case 'l': // Prefix: "location/list"
+
+				if l := len("location/list"); len(elem) >= l && elem[0:l] == "location/list" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleLocationListRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
 			case 'p': // Prefix: "profile/login"
 
 				if l := len("profile/login"); len(elem) >= l && elem[0:l] == "profile/login" {
@@ -186,6 +206,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
+				case 'c': // Prefix: "create"
+
+					if l := len("create"); len(elem) >= l && elem[0:l] == "create" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleCreateSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
 				case 'd': // Prefix: "delete"
 
 					if l := len("delete"); len(elem) >= l && elem[0:l] == "delete" {
@@ -199,6 +239,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						switch r.Method {
 						case "POST":
 							s.handleDeleteSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+				case 'e': // Prefix: "edit"
+
+					if l := len("edit"); len(elem) >= l && elem[0:l] == "edit" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleEditSelectionRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -226,9 +286,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 
-				case 's': // Prefix: "save"
+				case 'l': // Prefix: "list"
 
-					if l := len("save"); len(elem) >= l && elem[0:l] == "save" {
+					if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 						elem = elem[l:]
 					} else {
 						break
@@ -237,10 +297,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						// Leaf node.
 						switch r.Method {
-						case "POST":
-							s.handleCreateSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleSelectionListRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, "GET")
 						}
 
 						return
@@ -428,6 +488,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 				}
 
+			case 'l': // Prefix: "location/list"
+
+				if l := len("location/list"); len(elem) >= l && elem[0:l] == "location/list" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = LocationListOperation
+						r.summary = "Get location list"
+						r.operationID = "locationList"
+						r.pathPattern = "/location/list"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
 			case 'p': // Prefix: "profile/login"
 
 				if l := len("profile/login"); len(elem) >= l && elem[0:l] == "profile/login" {
@@ -488,6 +572,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
+				case 'c': // Prefix: "create"
+
+					if l := len("create"); len(elem) >= l && elem[0:l] == "create" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = CreateSelectionOperation
+							r.summary = "Create a new selection"
+							r.operationID = "createSelection"
+							r.pathPattern = "/selection/create"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
 				case 'd': // Prefix: "delete"
 
 					if l := len("delete"); len(elem) >= l && elem[0:l] == "delete" {
@@ -504,6 +612,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.summary = "Delete a selection"
 							r.operationID = "deleteSelection"
 							r.pathPattern = "/selection/delete"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+				case 'e': // Prefix: "edit"
+
+					if l := len("edit"); len(elem) >= l && elem[0:l] == "edit" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = EditSelectionOperation
+							r.summary = "Edit new selection"
+							r.operationID = "editSelection"
+							r.pathPattern = "/selection/edit"
 							r.args = args
 							r.count = 0
 							return r, true
@@ -536,9 +668,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 					}
 
-				case 's': // Prefix: "save"
+				case 'l': // Prefix: "list"
 
-					if l := len("save"); len(elem) >= l && elem[0:l] == "save" {
+					if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 						elem = elem[l:]
 					} else {
 						break
@@ -547,11 +679,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					if len(elem) == 0 {
 						// Leaf node.
 						switch method {
-						case "POST":
-							r.name = CreateSelectionOperation
-							r.summary = "Create a new selection"
-							r.operationID = "createSelection"
-							r.pathPattern = "/selection/save"
+						case "GET":
+							r.name = SelectionListOperation
+							r.summary = "Get selection list"
+							r.operationID = "selectionList"
+							r.pathPattern = "/selection/list"
 							r.args = args
 							r.count = 0
 							return r, true

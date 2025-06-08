@@ -44,7 +44,7 @@ type Invoker interface {
 	//
 	// Create a new selection for the user with name, comment, and form.
 	//
-	// POST /selection/save
+	// POST /selection/create
 	CreateSelection(ctx context.Context, request *CreateSelectionReq) (CreateSelectionRes, error)
 	// DeleteSelection invokes deleteSelection operation.
 	//
@@ -56,6 +56,12 @@ type Invoker interface {
 	//
 	// POST /developments/search/filter
 	DevelopmentSearch(ctx context.Context, request *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// EditSelection invokes editSelection operation.
+	//
+	// Edit new selection.
+	//
+	// POST /selection/edit
+	EditSelection(ctx context.Context, request *EditSelectionReq) (EditSelectionRes, error)
 	// GenerateInfrastructureHeatmap invokes generateInfrastructureHeatmap operation.
 	//
 	// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
@@ -69,6 +75,18 @@ type Invoker interface {
 	//
 	// GET /infrastructure/radius
 	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
+	// LocationList invokes locationList operation.
+	//
+	// Get location list.
+	//
+	// GET /location/list
+	LocationList(ctx context.Context) (LocationListRes, error)
+	// SelectionList invokes selectionList operation.
+	//
+	// Get selection list.
+	//
+	// GET /selection/list
+	SelectionList(ctx context.Context) (SelectionListRes, error)
 	// UserLogin invokes userLogin operation.
 	//
 	// Authenticate the user using email and password.
@@ -303,7 +321,7 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 //
 // Create a new selection for the user with name, comment, and form.
 //
-// POST /selection/save
+// POST /selection/create
 func (c *Client) CreateSelection(ctx context.Context, request *CreateSelectionReq) (CreateSelectionRes, error) {
 	res, err := c.sendCreateSelection(ctx, request)
 	return res, err
@@ -313,7 +331,7 @@ func (c *Client) sendCreateSelection(ctx context.Context, request *CreateSelecti
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createSelection"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/selection/save"),
+		semconv.HTTPRouteKey.String("/selection/create"),
 	}
 
 	// Run stopwatch.
@@ -346,7 +364,7 @@ func (c *Client) sendCreateSelection(ctx context.Context, request *CreateSelecti
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/selection/save"
+	pathParts[0] = "/selection/create"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -537,6 +555,81 @@ func (c *Client) sendDevelopmentSearch(ctx context.Context, request *Development
 	return result, nil
 }
 
+// EditSelection invokes editSelection operation.
+//
+// Edit new selection.
+//
+// POST /selection/edit
+func (c *Client) EditSelection(ctx context.Context, request *EditSelectionReq) (EditSelectionRes, error) {
+	res, err := c.sendEditSelection(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendEditSelection(ctx context.Context, request *EditSelectionReq) (res EditSelectionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("editSelection"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/selection/edit"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, EditSelectionOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/selection/edit"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeEditSelectionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeEditSelectionResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GenerateInfrastructureHeatmap invokes generateInfrastructureHeatmap operation.
 //
 // Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
@@ -710,6 +803,150 @@ func (c *Client) sendInfrastructureRadiusBoard(ctx context.Context, params Infra
 
 	stage = "DecodeResponse"
 	result, err := decodeInfrastructureRadiusBoardResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// LocationList invokes locationList operation.
+//
+// Get location list.
+//
+// GET /location/list
+func (c *Client) LocationList(ctx context.Context) (LocationListRes, error) {
+	res, err := c.sendLocationList(ctx)
+	return res, err
+}
+
+func (c *Client) sendLocationList(ctx context.Context) (res LocationListRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("locationList"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/location/list"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, LocationListOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/location/list"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeLocationListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SelectionList invokes selectionList operation.
+//
+// Get selection list.
+//
+// GET /selection/list
+func (c *Client) SelectionList(ctx context.Context) (SelectionListRes, error) {
+	res, err := c.sendSelectionList(ctx)
+	return res, err
+}
+
+func (c *Client) sendSelectionList(ctx context.Context) (res SelectionListRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("selectionList"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/selection/list"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SelectionListOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/selection/list"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSelectionListResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

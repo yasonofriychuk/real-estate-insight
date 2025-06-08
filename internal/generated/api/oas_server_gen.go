@@ -24,7 +24,7 @@ type Handler interface {
 	//
 	// Create a new selection for the user with name, comment, and form.
 	//
-	// POST /selection/save
+	// POST /selection/create
 	CreateSelection(ctx context.Context, req *CreateSelectionReq) (CreateSelectionRes, error)
 	// DeleteSelection implements deleteSelection operation.
 	//
@@ -36,6 +36,12 @@ type Handler interface {
 	//
 	// POST /developments/search/filter
 	DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (DevelopmentSearchRes, error)
+	// EditSelection implements editSelection operation.
+	//
+	// Edit new selection.
+	//
+	// POST /selection/edit
+	EditSelection(ctx context.Context, req *EditSelectionReq) (EditSelectionRes, error)
 	// GenerateInfrastructureHeatmap implements generateInfrastructureHeatmap operation.
 	//
 	// Returns a grid-based heatmap for infrastructure objects based on type weights within a selected
@@ -49,6 +55,18 @@ type Handler interface {
 	//
 	// GET /infrastructure/radius
 	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
+	// LocationList implements locationList operation.
+	//
+	// Get location list.
+	//
+	// GET /location/list
+	LocationList(ctx context.Context) (LocationListRes, error)
+	// SelectionList implements selectionList operation.
+	//
+	// Get selection list.
+	//
+	// GET /selection/list
+	SelectionList(ctx context.Context) (SelectionListRes, error)
 	// UserLogin implements userLogin operation.
 	//
 	// Authenticate the user using email and password.

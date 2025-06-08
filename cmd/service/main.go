@@ -4,12 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_heatmap"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/location_list"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/profile_login"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_create"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_delete"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_edit"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_favorite"
-	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_save"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_list"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/auth"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/location"
 	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/profile"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/selection"
 	"log/slog"
 	"net/http"
 	"os"
@@ -33,10 +38,10 @@ import (
 func main() {
 	ctx := context.Background()
 	log := logger.NewLogger(slog.LevelDebug, "dev", os.Stdout)
-	rb := route_builder.NewRouteBuilder()
 	cfg := config.MustNewConfigWithEnv()
 
 	jwtService := auth.NewJwtService(cfg.JwtSecretKey())
+	rb := route_builder.NewRouteBuilder()
 
 	pg, err := postgres.New(cfg.PgUrl())
 	if err != nil {
@@ -48,6 +53,8 @@ func main() {
 	infrastructureStorage := infrastructure.New(pg.Pool)
 	coordinatesStorage := coordinates.New(pg.Pool)
 	profileStorage := profile.New(pg.Pool)
+	selectionStorage := selection.New(pg.Pool)
+	locationStorage := location.New(pg.Pool)
 
 	srv := serviceapi.API{
 		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
@@ -55,9 +62,12 @@ func main() {
 		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
 		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage),
 		ProfileLoginHandler:              profile_login.New(log, jwtService, profileStorage),
-		SelectionDeleteHandler:           selection_delete.New(log),
+		SelectionDeleteHandler:           selection_delete.New(log, selectionStorage),
 		SelectionFavoriteHandler:         selection_favorite.New(log),
-		SelectionSaveHandler:             selection_save.New(log),
+		SelectionCreateHandler:           selection_create.New(log, selectionStorage),
+		SelectionListHandler:             selection_list.New(log, selectionStorage),
+		LocationListHandler:              location_list.New(log, locationStorage),
+		SelectionEditHandler:             selection_edit.New(log, selectionStorage),
 	}
 
 	server, err := api.NewServer(srv)
@@ -66,8 +76,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Оборачиваем в CORS
-	corsHandler := cors.New(cors.Options{
+	corsAuthHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
@@ -75,7 +84,7 @@ func main() {
 	}).Handler(auth.MustNewMiddleware(server, jwtService, api.UserLoginOperation))
 
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", corsHandler))
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", corsAuthHandler))
 	mux.Handle("/", http.FileServer(http.Dir("static")))
 
 	log.WithContext(ctx).Info("server start")

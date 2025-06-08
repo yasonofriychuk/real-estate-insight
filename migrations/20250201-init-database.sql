@@ -22,11 +22,14 @@ CREATE TABLE IF NOT EXISTS development (
     deleted_at timestamp
 );
 
+CREATE TYPE location_type AS ENUM('country', 'city', 'region');
+
 CREATE TABLE IF NOT EXISTS location (
     id BIGINT PRIMARY KEY,
     region_id BIGINT references location(id),
     country_id BIGINT references location(id),
-    name TEXT not null
+    name TEXT not null,
+    loc_type location_type not null
 );
 
 CREATE TABLE IF NOT EXISTS profile (
