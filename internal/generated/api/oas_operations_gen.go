@@ -15,6 +15,7 @@ const (
 	GenerateInfrastructureHeatmapOperation OperationName = "GenerateInfrastructureHeatmap"
 	InfrastructureRadiusBoardOperation     OperationName = "InfrastructureRadiusBoard"
 	LocationListOperation                  OperationName = "LocationList"
+	SelectionByIdOperation                 OperationName = "SelectionById"
 	SelectionListOperation                 OperationName = "SelectionList"
 	UserLoginOperation                     OperationName = "UserLogin"
 )

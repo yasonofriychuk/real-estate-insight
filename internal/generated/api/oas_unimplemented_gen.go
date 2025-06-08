@@ -51,7 +51,7 @@ func (UnimplementedHandler) DeleteSelection(ctx context.Context, params DeleteSe
 
 // DevelopmentSearch implements developmentSearch operation.
 //
-// POST /developments/search/filter
+// POST /developments/search
 func (UnimplementedHandler) DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (r DevelopmentSearchRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -90,6 +90,15 @@ func (UnimplementedHandler) InfrastructureRadiusBoard(ctx context.Context, param
 //
 // GET /location/list
 func (UnimplementedHandler) LocationList(ctx context.Context) (r LocationListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SelectionById implements selectionById operation.
+//
+// Get selection.
+//
+// GET /selection/{selectionId}
+func (UnimplementedHandler) SelectionById(ctx context.Context, params SelectionByIdParams) (r SelectionByIdRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

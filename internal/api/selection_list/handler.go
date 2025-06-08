@@ -34,8 +34,8 @@ func (h *SelectionListHandler) SelectionList(ctx context.Context) (api.Selection
 	}
 
 	return &api.SelectionListOK{
-		Selections: lo.Map(selections, func(s selection.Selection, _ int) api.SelectionListOKSelectionsItem {
-			return api.SelectionListOKSelectionsItem{
+		Selections: lo.Map(selections, func(s selection.Selection, _ int) api.Selection {
+			return api.Selection{
 				SelectionId: s.Id,
 				Name:        s.Name,
 				Comment:     s.Comment,

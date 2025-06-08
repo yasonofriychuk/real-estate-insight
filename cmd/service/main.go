@@ -6,6 +6,7 @@ import (
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_heatmap"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/location_list"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/profile_login"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_by_id"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_create"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_delete"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_edit"
@@ -58,16 +59,17 @@ func main() {
 
 	srv := serviceapi.API{
 		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
-		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage),
+		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage, selectionStorage),
 		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
 		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage),
 		ProfileLoginHandler:              profile_login.New(log, jwtService, profileStorage),
 		SelectionDeleteHandler:           selection_delete.New(log, selectionStorage),
-		SelectionFavoriteHandler:         selection_favorite.New(log),
+		SelectionFavoriteHandler:         selection_favorite.New(log, selectionStorage),
 		SelectionCreateHandler:           selection_create.New(log, selectionStorage),
 		SelectionListHandler:             selection_list.New(log, selectionStorage),
 		LocationListHandler:              location_list.New(log, locationStorage),
 		SelectionEditHandler:             selection_edit.New(log, selectionStorage),
+		SelectionByIdHandler:             selection_by_id.New(log, selectionStorage, developmentStorage),
 	}
 
 	server, err := api.NewServer(srv)

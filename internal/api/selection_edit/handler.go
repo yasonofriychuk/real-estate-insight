@@ -39,13 +39,13 @@ func (h *SelectionEditHandler) EditSelection(ctx context.Context, request *api.E
 		},
 	})
 	if err != nil {
-		h.log.WithContext(ctx).WithError(err).Error("edit selection failed")
 		if stderrors.Is(err, selection.ErrAccessDeniedOrNotFound) {
 			return pointer.To(api.EditSelectionNotFound(errors.BuildError(
 				http.StatusNotFound, "selection not found",
 			))), nil
 		}
 
+		h.log.WithContext(ctx).WithError(err).Error("edit selection failed")
 		return pointer.To(api.EditSelectionInternalServerError(errors.BuildError(
 			http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError),
 		))), nil

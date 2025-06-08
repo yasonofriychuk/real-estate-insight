@@ -3,6 +3,7 @@ package development
 import (
 	"context"
 	"fmt"
+	"github.com/AlekSi/pointer"
 
 	"github.com/Masterminds/squirrel"
 )
@@ -89,6 +90,10 @@ func modifyBuilderByFilter(b squirrel.SelectBuilder, filter Filter) squirrel.Sel
 
 	if filter.SearchQuery != "" {
 		b = b.Where(squirrel.Expr("name ILIKE ?", "%"+filter.SearchQuery+"%"))
+	}
+
+	if filter.DevelopmentIds != nil {
+		b = b.Where(squirrel.Eq{"id": pointer.Get(filter.DevelopmentIds)})
 	}
 
 	return b

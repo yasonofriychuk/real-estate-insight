@@ -34,7 +34,7 @@ type Handler interface {
 	DeleteSelection(ctx context.Context, params DeleteSelectionParams) (DeleteSelectionRes, error)
 	// DevelopmentSearch implements developmentSearch operation.
 	//
-	// POST /developments/search/filter
+	// POST /developments/search
 	DevelopmentSearch(ctx context.Context, req *DevelopmentSearchReq) (DevelopmentSearchRes, error)
 	// EditSelection implements editSelection operation.
 	//
@@ -61,6 +61,12 @@ type Handler interface {
 	//
 	// GET /location/list
 	LocationList(ctx context.Context) (LocationListRes, error)
+	// SelectionById implements selectionById operation.
+	//
+	// Get selection.
+	//
+	// GET /selection/{selectionId}
+	SelectionById(ctx context.Context, params SelectionByIdParams) (SelectionByIdRes, error)
 	// SelectionList implements selectionList operation.
 	//
 	// Get selection list.

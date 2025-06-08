@@ -53,11 +53,11 @@ func (h *HeatmapHandler) GenerateInfrastructureHeatmap(
 			Hospital:     10,
 			Sport:        10,
 			Shops:        10,
-			Kindergarten: 100,
+			Kindergarten: 10,
 			BusStop:      10,
 			School:       10,
 		},
-		CellSize: int(max(widthMeters/15, 50)),
+		CellSize: int(max((widthMeters/15)-float64(int64(widthMeters/15)%100), 50)),
 	}
 
 	hexagons, err := h.storage.InfrastructureHeatmap(ctx, params)

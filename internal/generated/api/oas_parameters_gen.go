@@ -4,6 +4,7 @@ package api
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/go-faster/errors"
 	"github.com/google/uuid"
@@ -302,6 +303,72 @@ func decodeInfrastructureRadiusBoardParams(args [0]string, argsEscaped bool, r *
 		return params, &ogenerrors.DecodeParamError{
 			Name: "radius",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// SelectionByIdParams is parameters of selectionById operation.
+type SelectionByIdParams struct {
+	// Идентификатор подборки.
+	SelectionId uuid.UUID
+}
+
+func unpackSelectionByIdParams(packed middleware.Parameters) (params SelectionByIdParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "selectionId",
+			In:   "path",
+		}
+		params.SelectionId = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeSelectionByIdParams(args [1]string, argsEscaped bool, r *http.Request) (params SelectionByIdParams, _ error) {
+	// Decode path: selectionId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "selectionId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.SelectionId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "selectionId",
+			In:   "path",
 			Err:  err,
 		}
 	}

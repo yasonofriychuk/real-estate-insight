@@ -133,7 +133,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
-  /developments/search/filter:
+  /developments/search:
     post:
       operationId: developmentSearch
       requestBody:
@@ -143,22 +143,11 @@ paths:
             schema:
               type: object
               properties:
+                selectionId:
+                  type: string
+                  format: uuid
                 searchQuery:
                   type: string
-                pagination:
-                  type: object
-                  required:
-                    - page
-                    - perPage
-                  properties:
-                    page:
-                      type: integer
-                      default: 1
-                    perPage:
-                      type: integer
-                      default: 10
-                      maximum: 100
-                      minimum: 1
                 board:
                   type: object
                   required:
@@ -272,30 +261,7 @@ paths:
                   selections:
                     type: array
                     items:
-                      type: object
-                      required:
-                        - selectionId
-                        - name
-                        - comment
-                        - createdAt
-                        - updatedAt
-                        - form
-                      properties:
-                        selectionId:
-                          type: string
-                          format: uuid
-                        name:
-                          type: string
-                        comment:
-                          type: string
-                        createdAt:
-                          type: string
-                          format: date-time
-                        updatedAt:
-                          type: string
-                          format: date-time
-                        form:
-                          $ref: "#/components/schemas/selectionForm"
+                      $ref: "#/components/schemas/selection"
         400:
           description: Bad request
           content:
@@ -485,12 +451,15 @@ paths:
               required:
                 - selection_id
                 - development_id
+                - value
               properties:
                 selection_id:
                   type: string
                   format: uuid
                 development_id:
                   type: integer
+                value:
+                  type: boolean
       responses:
         200:
           description: Successful operation
@@ -621,6 +590,112 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error"
+  /selection/{selectionId}:
+    parameters:
+      - name: selectionId
+        in: path
+        description: Идентификатор подборки
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get selection
+      description: Get selection
+      operationId: selectionById
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - selection
+                  - favoriteDevelopments
+                properties:
+                  selection:
+                    $ref: "#/components/schemas/selection"
+                  favoriteDevelopments:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - development
+                        - object3000mCounts
+                        - distance
+                      properties:
+                        development:
+                          $ref: "#/components/schemas/development"
+                        object3000mCounts:
+                          type: object
+                          required:
+                            - kindergarten
+                            - school
+                            - hospital
+                            - shops
+                            - sport
+                            - busStop
+                          properties:
+                            kindergarten:
+                              type: integer
+                            school:
+                              type: integer
+                            hospital:
+                              type: integer
+                            shops:
+                              type: integer
+                            sport:
+                              type: integer
+                            busStop:
+                              type: integer
+                        distance:
+                          type: object
+                          required:
+                            - kindergarten
+                            - school
+                            - hospital
+                            - shops
+                            - sport
+                            - busStop
+                          properties:
+                            kindergarten:
+                              type: integer
+                            school:
+                              type: integer
+                            hospital:
+                              type: integer
+                            shops:
+                              type: integer
+                            sport:
+                              type: integer
+                            busStop:
+                              type: integer
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        404:
+          description: NotFount
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
 components:
   schemas:
     development:
@@ -631,6 +706,10 @@ components:
         - coords
         - imageUrl
         - description
+        - avitoUrl
+        - gisUrl
+        - address
+        - isFavorite
       properties:
         id:
           type: integer
@@ -653,6 +732,12 @@ components:
           type: string
         isFavorite:
           type: boolean
+        avitoUrl:
+          type: string
+        gisUrl:
+          type: string
+        address:
+          type: string
     selectionForm:
       type: object
       required:
@@ -690,6 +775,31 @@ components:
           type: integer
           minimum: 0
           maximum: 10
+    selection:
+      type: object
+      required:
+        - selectionId
+        - name
+        - comment
+        - createdAt
+        - updatedAt
+        - form
+      properties:
+        selectionId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        form:
+          $ref: "#/components/schemas/selectionForm"
     error:
       type: object
       required:

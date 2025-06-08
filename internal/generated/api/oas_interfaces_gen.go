@@ -37,6 +37,10 @@ type LocationListRes interface {
 	locationListRes()
 }
 
+type SelectionByIdRes interface {
+	selectionByIdRes()
+}
+
 type SelectionListRes interface {
 	selectionListRes()
 }

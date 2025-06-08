@@ -37,6 +37,7 @@ func (*AddToFavoriteSelectionOK) addToFavoriteSelectionRes() {}
 type AddToFavoriteSelectionReq struct {
 	SelectionID   uuid.UUID `json:"selection_id"`
 	DevelopmentID int       `json:"development_id"`
+	Value         bool      `json:"value"`
 }
 
 // GetSelectionID returns the value of SelectionID.
@@ -49,6 +50,11 @@ func (s *AddToFavoriteSelectionReq) GetDevelopmentID() int {
 	return s.DevelopmentID
 }
 
+// GetValue returns the value of Value.
+func (s *AddToFavoriteSelectionReq) GetValue() bool {
+	return s.Value
+}
+
 // SetSelectionID sets the value of SelectionID.
 func (s *AddToFavoriteSelectionReq) SetSelectionID(val uuid.UUID) {
 	s.SelectionID = val
@@ -57,6 +63,11 @@ func (s *AddToFavoriteSelectionReq) SetSelectionID(val uuid.UUID) {
 // SetDevelopmentID sets the value of DevelopmentID.
 func (s *AddToFavoriteSelectionReq) SetDevelopmentID(val int) {
 	s.DevelopmentID = val
+}
+
+// SetValue sets the value of Value.
+func (s *AddToFavoriteSelectionReq) SetValue(val bool) {
+	s.Value = val
 }
 
 type AddToFavoriteSelectionUnauthorized Error
@@ -187,7 +198,10 @@ type Development struct {
 	Coords      DevelopmentCoords `json:"coords"`
 	ImageUrl    string            `json:"imageUrl"`
 	Description string            `json:"description"`
-	IsFavorite  OptBool           `json:"isFavorite"`
+	IsFavorite  bool              `json:"isFavorite"`
+	AvitoUrl    string            `json:"avitoUrl"`
+	GisUrl      string            `json:"gisUrl"`
+	Address     string            `json:"address"`
 }
 
 // GetID returns the value of ID.
@@ -216,8 +230,23 @@ func (s *Development) GetDescription() string {
 }
 
 // GetIsFavorite returns the value of IsFavorite.
-func (s *Development) GetIsFavorite() OptBool {
+func (s *Development) GetIsFavorite() bool {
 	return s.IsFavorite
+}
+
+// GetAvitoUrl returns the value of AvitoUrl.
+func (s *Development) GetAvitoUrl() string {
+	return s.AvitoUrl
+}
+
+// GetGisUrl returns the value of GisUrl.
+func (s *Development) GetGisUrl() string {
+	return s.GisUrl
+}
+
+// GetAddress returns the value of Address.
+func (s *Development) GetAddress() string {
+	return s.Address
 }
 
 // SetID sets the value of ID.
@@ -246,8 +275,23 @@ func (s *Development) SetDescription(val string) {
 }
 
 // SetIsFavorite sets the value of IsFavorite.
-func (s *Development) SetIsFavorite(val OptBool) {
+func (s *Development) SetIsFavorite(val bool) {
 	s.IsFavorite = val
+}
+
+// SetAvitoUrl sets the value of AvitoUrl.
+func (s *Development) SetAvitoUrl(val string) {
+	s.AvitoUrl = val
+}
+
+// SetGisUrl sets the value of GisUrl.
+func (s *Development) SetGisUrl(val string) {
+	s.GisUrl = val
+}
+
+// SetAddress sets the value of Address.
+func (s *Development) SetAddress(val string) {
+	s.Address = val
 }
 
 type DevelopmentCoords struct {
@@ -325,9 +369,14 @@ func (s *DevelopmentSearchOKMeta) SetTotal(val int64) {
 }
 
 type DevelopmentSearchReq struct {
-	SearchQuery OptString                         `json:"searchQuery"`
-	Pagination  OptDevelopmentSearchReqPagination `json:"pagination"`
-	Board       OptDevelopmentSearchReqBoard      `json:"board"`
+	SelectionId OptUUID                      `json:"selectionId"`
+	SearchQuery OptString                    `json:"searchQuery"`
+	Board       OptDevelopmentSearchReqBoard `json:"board"`
+}
+
+// GetSelectionId returns the value of SelectionId.
+func (s *DevelopmentSearchReq) GetSelectionId() OptUUID {
+	return s.SelectionId
 }
 
 // GetSearchQuery returns the value of SearchQuery.
@@ -335,24 +384,19 @@ func (s *DevelopmentSearchReq) GetSearchQuery() OptString {
 	return s.SearchQuery
 }
 
-// GetPagination returns the value of Pagination.
-func (s *DevelopmentSearchReq) GetPagination() OptDevelopmentSearchReqPagination {
-	return s.Pagination
-}
-
 // GetBoard returns the value of Board.
 func (s *DevelopmentSearchReq) GetBoard() OptDevelopmentSearchReqBoard {
 	return s.Board
 }
 
+// SetSelectionId sets the value of SelectionId.
+func (s *DevelopmentSearchReq) SetSelectionId(val OptUUID) {
+	s.SelectionId = val
+}
+
 // SetSearchQuery sets the value of SearchQuery.
 func (s *DevelopmentSearchReq) SetSearchQuery(val OptString) {
 	s.SearchQuery = val
-}
-
-// SetPagination sets the value of Pagination.
-func (s *DevelopmentSearchReq) SetPagination(val OptDevelopmentSearchReqPagination) {
-	s.Pagination = val
 }
 
 // SetBoard sets the value of Board.
@@ -405,31 +449,6 @@ func (s *DevelopmentSearchReqBoard) SetBottomRightLon(val float64) {
 // SetBottomRightLat sets the value of BottomRightLat.
 func (s *DevelopmentSearchReqBoard) SetBottomRightLat(val float64) {
 	s.BottomRightLat = val
-}
-
-type DevelopmentSearchReqPagination struct {
-	Page    int `json:"page"`
-	PerPage int `json:"perPage"`
-}
-
-// GetPage returns the value of Page.
-func (s *DevelopmentSearchReqPagination) GetPage() int {
-	return s.Page
-}
-
-// GetPerPage returns the value of PerPage.
-func (s *DevelopmentSearchReqPagination) GetPerPage() int {
-	return s.PerPage
-}
-
-// SetPage sets the value of Page.
-func (s *DevelopmentSearchReqPagination) SetPage(val int) {
-	s.Page = val
-}
-
-// SetPerPage sets the value of PerPage.
-func (s *DevelopmentSearchReqPagination) SetPerPage(val int) {
-	s.PerPage = val
 }
 
 type EditSelectionBadRequest Error
@@ -872,52 +891,6 @@ type LocationListUnauthorized Error
 
 func (*LocationListUnauthorized) locationListRes() {}
 
-// NewOptBool returns new OptBool with value set to v.
-func NewOptBool(v bool) OptBool {
-	return OptBool{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBool is optional bool.
-type OptBool struct {
-	Value bool
-	Set   bool
-}
-
-// IsSet returns true if OptBool was set.
-func (o OptBool) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBool) Reset() {
-	var v bool
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBool) SetTo(v bool) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBool) Get() (v bool, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBool) Or(d bool) bool {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptDevelopmentSearchReqBoard returns new OptDevelopmentSearchReqBoard with value set to v.
 func NewOptDevelopmentSearchReqBoard(v DevelopmentSearchReqBoard) OptDevelopmentSearchReqBoard {
 	return OptDevelopmentSearchReqBoard{
@@ -958,52 +931,6 @@ func (o OptDevelopmentSearchReqBoard) Get() (v DevelopmentSearchReqBoard, ok boo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptDevelopmentSearchReqBoard) Or(d DevelopmentSearchReqBoard) DevelopmentSearchReqBoard {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptDevelopmentSearchReqPagination returns new OptDevelopmentSearchReqPagination with value set to v.
-func NewOptDevelopmentSearchReqPagination(v DevelopmentSearchReqPagination) OptDevelopmentSearchReqPagination {
-	return OptDevelopmentSearchReqPagination{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptDevelopmentSearchReqPagination is optional DevelopmentSearchReqPagination.
-type OptDevelopmentSearchReqPagination struct {
-	Value DevelopmentSearchReqPagination
-	Set   bool
-}
-
-// IsSet returns true if OptDevelopmentSearchReqPagination was set.
-func (o OptDevelopmentSearchReqPagination) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptDevelopmentSearchReqPagination) Reset() {
-	var v DevelopmentSearchReqPagination
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptDevelopmentSearchReqPagination) SetTo(v DevelopmentSearchReqPagination) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptDevelopmentSearchReqPagination) Get() (v DevelopmentSearchReqPagination, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptDevelopmentSearchReqPagination) Or(d DevelopmentSearchReqPagination) DevelopmentSearchReqPagination {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1055,6 +982,339 @@ func (o OptString) Or(d string) string {
 	}
 	return d
 }
+
+// NewOptUUID returns new OptUUID with value set to v.
+func NewOptUUID(v uuid.UUID) OptUUID {
+	return OptUUID{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptUUID is optional uuid.UUID.
+type OptUUID struct {
+	Value uuid.UUID
+	Set   bool
+}
+
+// IsSet returns true if OptUUID was set.
+func (o OptUUID) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptUUID) Reset() {
+	var v uuid.UUID
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptUUID) SetTo(v uuid.UUID) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptUUID) Get() (v uuid.UUID, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// Ref: #/components/schemas/selection
+type Selection struct {
+	SelectionId uuid.UUID     `json:"selectionId"`
+	Name        string        `json:"name"`
+	Comment     string        `json:"comment"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	UpdatedAt   time.Time     `json:"updatedAt"`
+	Form        SelectionForm `json:"form"`
+}
+
+// GetSelectionId returns the value of SelectionId.
+func (s *Selection) GetSelectionId() uuid.UUID {
+	return s.SelectionId
+}
+
+// GetName returns the value of Name.
+func (s *Selection) GetName() string {
+	return s.Name
+}
+
+// GetComment returns the value of Comment.
+func (s *Selection) GetComment() string {
+	return s.Comment
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *Selection) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Selection) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetForm returns the value of Form.
+func (s *Selection) GetForm() SelectionForm {
+	return s.Form
+}
+
+// SetSelectionId sets the value of SelectionId.
+func (s *Selection) SetSelectionId(val uuid.UUID) {
+	s.SelectionId = val
+}
+
+// SetName sets the value of Name.
+func (s *Selection) SetName(val string) {
+	s.Name = val
+}
+
+// SetComment sets the value of Comment.
+func (s *Selection) SetComment(val string) {
+	s.Comment = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *Selection) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Selection) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetForm sets the value of Form.
+func (s *Selection) SetForm(val SelectionForm) {
+	s.Form = val
+}
+
+type SelectionByIdBadRequest Error
+
+func (*SelectionByIdBadRequest) selectionByIdRes() {}
+
+type SelectionByIdInternalServerError Error
+
+func (*SelectionByIdInternalServerError) selectionByIdRes() {}
+
+type SelectionByIdNotFound Error
+
+func (*SelectionByIdNotFound) selectionByIdRes() {}
+
+type SelectionByIdOK struct {
+	Selection            Selection                                 `json:"selection"`
+	FavoriteDevelopments []SelectionByIdOKFavoriteDevelopmentsItem `json:"favoriteDevelopments"`
+}
+
+// GetSelection returns the value of Selection.
+func (s *SelectionByIdOK) GetSelection() Selection {
+	return s.Selection
+}
+
+// GetFavoriteDevelopments returns the value of FavoriteDevelopments.
+func (s *SelectionByIdOK) GetFavoriteDevelopments() []SelectionByIdOKFavoriteDevelopmentsItem {
+	return s.FavoriteDevelopments
+}
+
+// SetSelection sets the value of Selection.
+func (s *SelectionByIdOK) SetSelection(val Selection) {
+	s.Selection = val
+}
+
+// SetFavoriteDevelopments sets the value of FavoriteDevelopments.
+func (s *SelectionByIdOK) SetFavoriteDevelopments(val []SelectionByIdOKFavoriteDevelopmentsItem) {
+	s.FavoriteDevelopments = val
+}
+
+func (*SelectionByIdOK) selectionByIdRes() {}
+
+type SelectionByIdOKFavoriteDevelopmentsItem struct {
+	Development       Development                                              `json:"development"`
+	Object3000mCounts SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts `json:"object3000mCounts"`
+	Distance          SelectionByIdOKFavoriteDevelopmentsItemDistance          `json:"distance"`
+}
+
+// GetDevelopment returns the value of Development.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetDevelopment() Development {
+	return s.Development
+}
+
+// GetObject3000mCounts returns the value of Object3000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject3000mCounts() SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts {
+	return s.Object3000mCounts
+}
+
+// GetDistance returns the value of Distance.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetDistance() SelectionByIdOKFavoriteDevelopmentsItemDistance {
+	return s.Distance
+}
+
+// SetDevelopment sets the value of Development.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetDevelopment(val Development) {
+	s.Development = val
+}
+
+// SetObject3000mCounts sets the value of Object3000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject3000mCounts(val SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) {
+	s.Object3000mCounts = val
+}
+
+// SetDistance sets the value of Distance.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetDistance(val SelectionByIdOKFavoriteDevelopmentsItemDistance) {
+	s.Distance = val
+}
+
+type SelectionByIdOKFavoriteDevelopmentsItemDistance struct {
+	Kindergarten int `json:"kindergarten"`
+	School       int `json:"school"`
+	Hospital     int `json:"hospital"`
+	Shops        int `json:"shops"`
+	Sport        int `json:"sport"`
+	BusStop      int `json:"busStop"`
+}
+
+// GetKindergarten returns the value of Kindergarten.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetKindergarten() int {
+	return s.Kindergarten
+}
+
+// GetSchool returns the value of School.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetSchool() int {
+	return s.School
+}
+
+// GetHospital returns the value of Hospital.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetHospital() int {
+	return s.Hospital
+}
+
+// GetShops returns the value of Shops.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetShops() int {
+	return s.Shops
+}
+
+// GetSport returns the value of Sport.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetSport() int {
+	return s.Sport
+}
+
+// GetBusStop returns the value of BusStop.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetBusStop() int {
+	return s.BusStop
+}
+
+// SetKindergarten sets the value of Kindergarten.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetKindergarten(val int) {
+	s.Kindergarten = val
+}
+
+// SetSchool sets the value of School.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetSchool(val int) {
+	s.School = val
+}
+
+// SetHospital sets the value of Hospital.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetHospital(val int) {
+	s.Hospital = val
+}
+
+// SetShops sets the value of Shops.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetShops(val int) {
+	s.Shops = val
+}
+
+// SetSport sets the value of Sport.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetSport(val int) {
+	s.Sport = val
+}
+
+// SetBusStop sets the value of BusStop.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetBusStop(val int) {
+	s.BusStop = val
+}
+
+type SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts struct {
+	Kindergarten int `json:"kindergarten"`
+	School       int `json:"school"`
+	Hospital     int `json:"hospital"`
+	Shops        int `json:"shops"`
+	Sport        int `json:"sport"`
+	BusStop      int `json:"busStop"`
+}
+
+// GetKindergarten returns the value of Kindergarten.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetKindergarten() int {
+	return s.Kindergarten
+}
+
+// GetSchool returns the value of School.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetSchool() int {
+	return s.School
+}
+
+// GetHospital returns the value of Hospital.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetHospital() int {
+	return s.Hospital
+}
+
+// GetShops returns the value of Shops.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetShops() int {
+	return s.Shops
+}
+
+// GetSport returns the value of Sport.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetSport() int {
+	return s.Sport
+}
+
+// GetBusStop returns the value of BusStop.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetBusStop() int {
+	return s.BusStop
+}
+
+// SetKindergarten sets the value of Kindergarten.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetKindergarten(val int) {
+	s.Kindergarten = val
+}
+
+// SetSchool sets the value of School.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetSchool(val int) {
+	s.School = val
+}
+
+// SetHospital sets the value of Hospital.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetHospital(val int) {
+	s.Hospital = val
+}
+
+// SetShops sets the value of Shops.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetShops(val int) {
+	s.Shops = val
+}
+
+// SetSport sets the value of Sport.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetSport(val int) {
+	s.Sport = val
+}
+
+// SetBusStop sets the value of BusStop.
+func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetBusStop(val int) {
+	s.BusStop = val
+}
+
+type SelectionByIdUnauthorized Error
+
+func (*SelectionByIdUnauthorized) selectionByIdRes() {}
 
 // Ref: #/components/schemas/selectionForm
 type SelectionForm struct {
@@ -1146,89 +1406,20 @@ type SelectionListInternalServerError Error
 func (*SelectionListInternalServerError) selectionListRes() {}
 
 type SelectionListOK struct {
-	Selections []SelectionListOKSelectionsItem `json:"selections"`
+	Selections []Selection `json:"selections"`
 }
 
 // GetSelections returns the value of Selections.
-func (s *SelectionListOK) GetSelections() []SelectionListOKSelectionsItem {
+func (s *SelectionListOK) GetSelections() []Selection {
 	return s.Selections
 }
 
 // SetSelections sets the value of Selections.
-func (s *SelectionListOK) SetSelections(val []SelectionListOKSelectionsItem) {
+func (s *SelectionListOK) SetSelections(val []Selection) {
 	s.Selections = val
 }
 
 func (*SelectionListOK) selectionListRes() {}
-
-type SelectionListOKSelectionsItem struct {
-	SelectionId uuid.UUID     `json:"selectionId"`
-	Name        string        `json:"name"`
-	Comment     string        `json:"comment"`
-	CreatedAt   time.Time     `json:"createdAt"`
-	UpdatedAt   time.Time     `json:"updatedAt"`
-	Form        SelectionForm `json:"form"`
-}
-
-// GetSelectionId returns the value of SelectionId.
-func (s *SelectionListOKSelectionsItem) GetSelectionId() uuid.UUID {
-	return s.SelectionId
-}
-
-// GetName returns the value of Name.
-func (s *SelectionListOKSelectionsItem) GetName() string {
-	return s.Name
-}
-
-// GetComment returns the value of Comment.
-func (s *SelectionListOKSelectionsItem) GetComment() string {
-	return s.Comment
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *SelectionListOKSelectionsItem) GetCreatedAt() time.Time {
-	return s.CreatedAt
-}
-
-// GetUpdatedAt returns the value of UpdatedAt.
-func (s *SelectionListOKSelectionsItem) GetUpdatedAt() time.Time {
-	return s.UpdatedAt
-}
-
-// GetForm returns the value of Form.
-func (s *SelectionListOKSelectionsItem) GetForm() SelectionForm {
-	return s.Form
-}
-
-// SetSelectionId sets the value of SelectionId.
-func (s *SelectionListOKSelectionsItem) SetSelectionId(val uuid.UUID) {
-	s.SelectionId = val
-}
-
-// SetName sets the value of Name.
-func (s *SelectionListOKSelectionsItem) SetName(val string) {
-	s.Name = val
-}
-
-// SetComment sets the value of Comment.
-func (s *SelectionListOKSelectionsItem) SetComment(val string) {
-	s.Comment = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *SelectionListOKSelectionsItem) SetCreatedAt(val time.Time) {
-	s.CreatedAt = val
-}
-
-// SetUpdatedAt sets the value of UpdatedAt.
-func (s *SelectionListOKSelectionsItem) SetUpdatedAt(val time.Time) {
-	s.UpdatedAt = val
-}
-
-// SetForm sets the value of Form.
-func (s *SelectionListOKSelectionsItem) SetForm(val SelectionForm) {
-	s.Form = val
-}
 
 type SelectionListUnauthorized Error
 

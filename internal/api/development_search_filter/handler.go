@@ -3,6 +3,7 @@ package development_search_filter
 import (
 	"context"
 	"fmt"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/auth"
 	"net/http"
 
 	"github.com/AlekSi/pointer"
@@ -21,18 +22,19 @@ const defaultImageUrl = "/images/no-image.jpeg"
 type DevelopmentSearchHandler struct {
 	log                logger.Log
 	developmentStorage developmentStorage
+	selectionStorage   selectionStorage
 }
 
-func New(log logger.Log, developmentStorage developmentStorage) *DevelopmentSearchHandler {
+func New(log logger.Log, developmentStorage developmentStorage, selectionStorage selectionStorage) *DevelopmentSearchHandler {
 	return &DevelopmentSearchHandler{
 		log:                log,
 		developmentStorage: developmentStorage,
+		selectionStorage:   selectionStorage,
 	}
 }
 
 func (h *DevelopmentSearchHandler) DevelopmentSearch(ctx context.Context, req *api.DevelopmentSearchReq) (api.DevelopmentSearchRes, error) {
 	var filter development.Filter
-	var pagination *development.Pagination
 
 	if v, ok := req.SearchQuery.Get(); ok {
 		filter.SearchQuery = v
@@ -42,13 +44,6 @@ func (h *DevelopmentSearchHandler) DevelopmentSearch(ctx context.Context, req *a
 		filter.Board = &development.Board{
 			BottomRight: orb.Point{v.BottomRightLon, v.BottomRightLat},
 			TopLeft:     orb.Point{v.TopLeftLon, v.TopLeftLat},
-		}
-	}
-
-	if v, ok := req.Pagination.Get(); ok {
-		pagination = &development.Pagination{
-			Page:    v.Page,
-			PerPage: v.PerPage,
 		}
 	}
 
@@ -65,9 +60,21 @@ func (h *DevelopmentSearchHandler) DevelopmentSearch(ctx context.Context, req *a
 
 	var devs []development.Development
 	errGroup.Go(func() (err error) {
-		devs, err = h.developmentStorage.SearchDevelopmentByFilters(groupCtx, filter, pagination)
+		devs, err = h.developmentStorage.SearchDevelopmentByFilters(groupCtx, filter, nil)
 		if err != nil {
 			return fmt.Errorf("search development by filters: %w", err)
+		}
+		return nil
+	})
+
+	var favoritesDevIds map[int64]bool
+	errGroup.Go(func() (err error) {
+		if !req.SelectionId.Set {
+			return nil
+		}
+		favoritesDevIds, err = h.selectionStorage.FavoriteDevelopments(ctx, req.SelectionId.Value, pointer.Get(auth.ProfileIdFromCtx(ctx)))
+		if err != nil {
+			return fmt.Errorf("get favorite developments: %w", err)
 		}
 		return nil
 	})
@@ -92,6 +99,10 @@ func (h *DevelopmentSearchHandler) DevelopmentSearch(ctx context.Context, req *a
 				},
 				ImageUrl:    lo.If(dev.Meta.ImageURL != "", dev.Meta.ImageURL).Else(defaultImageUrl),
 				Description: dev.Meta.Description,
+				AvitoUrl:    dev.Meta.AvitoUrl,
+				GisUrl:      dev.Meta.GisUrl,
+				Address:     dev.Meta.Address,
+				IsFavorite:  favoritesDevIds[dev.ID],
 			}
 		}),
 		Meta: api.DevelopmentSearchOKMeta{

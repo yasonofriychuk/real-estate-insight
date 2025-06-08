@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS development (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     cords GEOMETRY(Point, 4326),
+    location_id BIGINT references location not null,
     meta jsonb default '{}'::jsonb,
 
     created_at timestamp default current_timestamp NOT NULL,
@@ -52,8 +53,8 @@ CREATE TABLE IF NOT EXISTS selection (
 );
 
 CREATE TABLE IF NOT EXISTS favorite_selection_development (
-    development_id BIGINT not null references development(id),
-    selection_id uuid not null references selection(id),
+    development_id BIGINT not null references development(id) ON DELETE cascade,
+    selection_id uuid not null references selection(id) ON delete cascade,
 
     primary key (selection_id, development_id)
 );

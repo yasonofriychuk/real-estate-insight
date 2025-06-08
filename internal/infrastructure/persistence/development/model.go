@@ -11,8 +11,9 @@ import (
 )
 
 type Filter struct {
-	SearchQuery string
-	Board       *Board
+	SearchQuery    string
+	DevelopmentIds *[]int64
+	Board          *Board
 }
 
 type Pagination struct {
@@ -36,6 +37,9 @@ type Development struct {
 type Meta struct {
 	ImageURL    string `json:"image_url"`
 	Description string `json:"description"`
+	AvitoUrl    string `json:"avito_url"`
+	GisUrl      string `json:"2gis_url"`
+	Address     string `json:"address"`
 }
 
 func (m *Meta) Scan(value interface{}) error {

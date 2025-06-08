@@ -7,6 +7,7 @@ import (
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_radius_board"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/location_list"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/profile_login"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_by_id"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_create"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_delete"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_edit"
@@ -26,4 +27,5 @@ type API struct {
 	*selection_list.SelectionListHandler
 	*location_list.LocationListHandler
 	*selection_edit.SelectionEditHandler
+	*selection_by_id.SelectionByIdHandler
 }
