@@ -6,8 +6,12 @@ package api
 type OperationName = string
 
 const (
+	AddToFavoriteSelectionOperation        OperationName = "AddToFavoriteSelection"
 	BuildRoutesByPointsOperation           OperationName = "BuildRoutesByPoints"
+	CreateSelectionOperation               OperationName = "CreateSelection"
+	DeleteSelectionOperation               OperationName = "DeleteSelection"
 	DevelopmentSearchOperation             OperationName = "DevelopmentSearch"
 	GenerateInfrastructureHeatmapOperation OperationName = "GenerateInfrastructureHeatmap"
 	InfrastructureRadiusBoardOperation     OperationName = "InfrastructureRadiusBoard"
+	UserLoginOperation                     OperationName = "UserLogin"
 )

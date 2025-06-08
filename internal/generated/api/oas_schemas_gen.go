@@ -5,7 +5,61 @@ package api
 import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
+	"github.com/google/uuid"
 )
+
+type AddToFavoriteSelectionBadRequest Error
+
+func (*AddToFavoriteSelectionBadRequest) addToFavoriteSelectionRes() {}
+
+type AddToFavoriteSelectionInternalServerError Error
+
+func (*AddToFavoriteSelectionInternalServerError) addToFavoriteSelectionRes() {}
+
+type AddToFavoriteSelectionOK struct {
+	Status bool `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *AddToFavoriteSelectionOK) GetStatus() bool {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *AddToFavoriteSelectionOK) SetStatus(val bool) {
+	s.Status = val
+}
+
+func (*AddToFavoriteSelectionOK) addToFavoriteSelectionRes() {}
+
+type AddToFavoriteSelectionReq struct {
+	SelectionID   uuid.UUID `json:"selection_id"`
+	DevelopmentID int       `json:"development_id"`
+}
+
+// GetSelectionID returns the value of SelectionID.
+func (s *AddToFavoriteSelectionReq) GetSelectionID() uuid.UUID {
+	return s.SelectionID
+}
+
+// GetDevelopmentID returns the value of DevelopmentID.
+func (s *AddToFavoriteSelectionReq) GetDevelopmentID() int {
+	return s.DevelopmentID
+}
+
+// SetSelectionID sets the value of SelectionID.
+func (s *AddToFavoriteSelectionReq) SetSelectionID(val uuid.UUID) {
+	s.SelectionID = val
+}
+
+// SetDevelopmentID sets the value of DevelopmentID.
+func (s *AddToFavoriteSelectionReq) SetDevelopmentID(val int) {
+	s.DevelopmentID = val
+}
+
+type AddToFavoriteSelectionUnauthorized Error
+
+func (*AddToFavoriteSelectionUnauthorized) addToFavoriteSelectionRes() {}
 
 type BuildRoutesByPointsBadRequest Error
 
@@ -31,6 +85,189 @@ func (s *BuildRoutesByPointsOK) init() BuildRoutesByPointsOK {
 }
 
 func (*BuildRoutesByPointsOK) buildRoutesByPointsRes() {}
+
+type CreateSelectionBadRequest Error
+
+func (*CreateSelectionBadRequest) createSelectionRes() {}
+
+type CreateSelectionInternalServerError Error
+
+func (*CreateSelectionInternalServerError) createSelectionRes() {}
+
+type CreateSelectionOK struct {
+	Status bool `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *CreateSelectionOK) GetStatus() bool {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *CreateSelectionOK) SetStatus(val bool) {
+	s.Status = val
+}
+
+func (*CreateSelectionOK) createSelectionRes() {}
+
+type CreateSelectionReq struct {
+	SelectionID uuid.UUID              `json:"selection_id"`
+	Name        string                 `json:"name"`
+	Comment     string                 `json:"comment"`
+	Form        CreateSelectionReqForm `json:"form"`
+}
+
+// GetSelectionID returns the value of SelectionID.
+func (s *CreateSelectionReq) GetSelectionID() uuid.UUID {
+	return s.SelectionID
+}
+
+// GetName returns the value of Name.
+func (s *CreateSelectionReq) GetName() string {
+	return s.Name
+}
+
+// GetComment returns the value of Comment.
+func (s *CreateSelectionReq) GetComment() string {
+	return s.Comment
+}
+
+// GetForm returns the value of Form.
+func (s *CreateSelectionReq) GetForm() CreateSelectionReqForm {
+	return s.Form
+}
+
+// SetSelectionID sets the value of SelectionID.
+func (s *CreateSelectionReq) SetSelectionID(val uuid.UUID) {
+	s.SelectionID = val
+}
+
+// SetName sets the value of Name.
+func (s *CreateSelectionReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetComment sets the value of Comment.
+func (s *CreateSelectionReq) SetComment(val string) {
+	s.Comment = val
+}
+
+// SetForm sets the value of Form.
+func (s *CreateSelectionReq) SetForm(val CreateSelectionReqForm) {
+	s.Form = val
+}
+
+type CreateSelectionReqForm struct {
+	LocationID    int `json:"location_id"`
+	WHospital     int `json:"w_hospital"`
+	WSport        int `json:"w_sport"`
+	WShop         int `json:"w_shop"`
+	WKindergarten int `json:"w_kindergarten"`
+	WBusStop      int `json:"w_bus_stop"`
+	WSchool       int `json:"w_school"`
+}
+
+// GetLocationID returns the value of LocationID.
+func (s *CreateSelectionReqForm) GetLocationID() int {
+	return s.LocationID
+}
+
+// GetWHospital returns the value of WHospital.
+func (s *CreateSelectionReqForm) GetWHospital() int {
+	return s.WHospital
+}
+
+// GetWSport returns the value of WSport.
+func (s *CreateSelectionReqForm) GetWSport() int {
+	return s.WSport
+}
+
+// GetWShop returns the value of WShop.
+func (s *CreateSelectionReqForm) GetWShop() int {
+	return s.WShop
+}
+
+// GetWKindergarten returns the value of WKindergarten.
+func (s *CreateSelectionReqForm) GetWKindergarten() int {
+	return s.WKindergarten
+}
+
+// GetWBusStop returns the value of WBusStop.
+func (s *CreateSelectionReqForm) GetWBusStop() int {
+	return s.WBusStop
+}
+
+// GetWSchool returns the value of WSchool.
+func (s *CreateSelectionReqForm) GetWSchool() int {
+	return s.WSchool
+}
+
+// SetLocationID sets the value of LocationID.
+func (s *CreateSelectionReqForm) SetLocationID(val int) {
+	s.LocationID = val
+}
+
+// SetWHospital sets the value of WHospital.
+func (s *CreateSelectionReqForm) SetWHospital(val int) {
+	s.WHospital = val
+}
+
+// SetWSport sets the value of WSport.
+func (s *CreateSelectionReqForm) SetWSport(val int) {
+	s.WSport = val
+}
+
+// SetWShop sets the value of WShop.
+func (s *CreateSelectionReqForm) SetWShop(val int) {
+	s.WShop = val
+}
+
+// SetWKindergarten sets the value of WKindergarten.
+func (s *CreateSelectionReqForm) SetWKindergarten(val int) {
+	s.WKindergarten = val
+}
+
+// SetWBusStop sets the value of WBusStop.
+func (s *CreateSelectionReqForm) SetWBusStop(val int) {
+	s.WBusStop = val
+}
+
+// SetWSchool sets the value of WSchool.
+func (s *CreateSelectionReqForm) SetWSchool(val int) {
+	s.WSchool = val
+}
+
+type CreateSelectionUnauthorized Error
+
+func (*CreateSelectionUnauthorized) createSelectionRes() {}
+
+type DeleteSelectionBadRequest Error
+
+func (*DeleteSelectionBadRequest) deleteSelectionRes() {}
+
+type DeleteSelectionInternalServerError Error
+
+func (*DeleteSelectionInternalServerError) deleteSelectionRes() {}
+
+type DeleteSelectionOK struct {
+	Status bool `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *DeleteSelectionOK) GetStatus() bool {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *DeleteSelectionOK) SetStatus(val bool) {
+	s.Status = val
+}
+
+func (*DeleteSelectionOK) deleteSelectionRes() {}
+
+type DeleteSelectionUnauthorized Error
+
+func (*DeleteSelectionUnauthorized) deleteSelectionRes() {}
 
 // Ref: #/components/schemas/development
 type Development struct {
@@ -445,8 +682,6 @@ func (s *GenerateInfrastructureHeatmapOKItemGeometry) init() GenerateInfrastruct
 
 type GenerateInfrastructureHeatmapReq struct {
 	Bbox GenerateInfrastructureHeatmapReqBbox `json:"bbox"`
-	// Размер ячейки в метрах.
-	CellSize OptInt `json:"cellSize"`
 }
 
 // GetBbox returns the value of Bbox.
@@ -454,19 +689,9 @@ func (s *GenerateInfrastructureHeatmapReq) GetBbox() GenerateInfrastructureHeatm
 	return s.Bbox
 }
 
-// GetCellSize returns the value of CellSize.
-func (s *GenerateInfrastructureHeatmapReq) GetCellSize() OptInt {
-	return s.CellSize
-}
-
 // SetBbox sets the value of Bbox.
 func (s *GenerateInfrastructureHeatmapReq) SetBbox(val GenerateInfrastructureHeatmapReqBbox) {
 	s.Bbox = val
-}
-
-// SetCellSize sets the value of CellSize.
-func (s *GenerateInfrastructureHeatmapReq) SetCellSize(val OptInt) {
-	s.CellSize = val
 }
 
 type GenerateInfrastructureHeatmapReqBbox struct {
@@ -742,52 +967,6 @@ func (o OptDevelopmentSearchReqPagination) Or(d DevelopmentSearchReqPagination) 
 	return d
 }
 
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInt is optional int.
-type OptInt struct {
-	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -833,3 +1012,68 @@ func (o OptString) Or(d string) string {
 	}
 	return d
 }
+
+type UserLoginBadRequest Error
+
+func (*UserLoginBadRequest) userLoginRes() {}
+
+type UserLoginInternalServerError Error
+
+func (*UserLoginInternalServerError) userLoginRes() {}
+
+type UserLoginOK struct {
+	ProfileID uuid.UUID `json:"profile_id"`
+	// JWT authentication token.
+	Token string `json:"token"`
+}
+
+// GetProfileID returns the value of ProfileID.
+func (s *UserLoginOK) GetProfileID() uuid.UUID {
+	return s.ProfileID
+}
+
+// GetToken returns the value of Token.
+func (s *UserLoginOK) GetToken() string {
+	return s.Token
+}
+
+// SetProfileID sets the value of ProfileID.
+func (s *UserLoginOK) SetProfileID(val uuid.UUID) {
+	s.ProfileID = val
+}
+
+// SetToken sets the value of Token.
+func (s *UserLoginOK) SetToken(val string) {
+	s.Token = val
+}
+
+func (*UserLoginOK) userLoginRes() {}
+
+type UserLoginReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// GetEmail returns the value of Email.
+func (s *UserLoginReq) GetEmail() string {
+	return s.Email
+}
+
+// GetPassword returns the value of Password.
+func (s *UserLoginReq) GetPassword() string {
+	return s.Password
+}
+
+// SetEmail sets the value of Email.
+func (s *UserLoginReq) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetPassword sets the value of Password.
+func (s *UserLoginReq) SetPassword(val string) {
+	s.Password = val
+}
+
+type UserLoginUnauthorized Error
+
+func (*UserLoginUnauthorized) userLoginRes() {}

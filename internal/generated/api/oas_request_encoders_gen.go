@@ -11,6 +11,34 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
+func encodeAddToFavoriteSelectionRequest(
+	req *AddToFavoriteSelectionReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeCreateSelectionRequest(
+	req *CreateSelectionReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeDevelopmentSearchRequest(
 	req *DevelopmentSearchReq,
 	r *http.Request,
@@ -27,6 +55,20 @@ func encodeDevelopmentSearchRequest(
 
 func encodeGenerateInfrastructureHeatmapRequest(
 	req *GenerateInfrastructureHeatmapReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeUserLoginRequest(
+	req *UserLoginReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

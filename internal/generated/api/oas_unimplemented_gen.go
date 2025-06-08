@@ -13,12 +13,39 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AddToFavoriteSelection implements addToFavoriteSelection operation.
+//
+// Add or remove a development to/from the selected user's favorite selection.
+//
+// POST /selection/favorite
+func (UnimplementedHandler) AddToFavoriteSelection(ctx context.Context, req *AddToFavoriteSelectionReq) (r AddToFavoriteSelectionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // BuildRoutesByPoints implements buildRoutesByPoints operation.
 //
 // Build a route between points.
 //
 // GET /routes/build/points
 func (UnimplementedHandler) BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (r BuildRoutesByPointsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CreateSelection implements createSelection operation.
+//
+// Create a new selection for the user with name, comment, and form.
+//
+// POST /selection/save
+func (UnimplementedHandler) CreateSelection(ctx context.Context, req *CreateSelectionReq) (r CreateSelectionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteSelection implements deleteSelection operation.
+//
+// Delete a selection for the user by selection ID.
+//
+// POST /selection/delete
+func (UnimplementedHandler) DeleteSelection(ctx context.Context, params DeleteSelectionParams) (r DeleteSelectionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -45,5 +72,14 @@ func (UnimplementedHandler) GenerateInfrastructureHeatmap(ctx context.Context, r
 //
 // GET /infrastructure/radius
 func (UnimplementedHandler) InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (r InfrastructureRadiusBoardRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UserLogin implements userLogin operation.
+//
+// Authenticate the user using email and password.
+//
+// POST /profile/login
+func (UnimplementedHandler) UserLogin(ctx context.Context, req *UserLoginReq) (r UserLoginRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

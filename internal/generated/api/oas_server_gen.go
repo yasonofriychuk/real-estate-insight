@@ -8,12 +8,30 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// AddToFavoriteSelection implements addToFavoriteSelection operation.
+	//
+	// Add or remove a development to/from the selected user's favorite selection.
+	//
+	// POST /selection/favorite
+	AddToFavoriteSelection(ctx context.Context, req *AddToFavoriteSelectionReq) (AddToFavoriteSelectionRes, error)
 	// BuildRoutesByPoints implements buildRoutesByPoints operation.
 	//
 	// Build a route between points.
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// CreateSelection implements createSelection operation.
+	//
+	// Create a new selection for the user with name, comment, and form.
+	//
+	// POST /selection/save
+	CreateSelection(ctx context.Context, req *CreateSelectionReq) (CreateSelectionRes, error)
+	// DeleteSelection implements deleteSelection operation.
+	//
+	// Delete a selection for the user by selection ID.
+	//
+	// POST /selection/delete
+	DeleteSelection(ctx context.Context, params DeleteSelectionParams) (DeleteSelectionRes, error)
 	// DevelopmentSearch implements developmentSearch operation.
 	//
 	// POST /developments/search/filter
@@ -31,6 +49,12 @@ type Handler interface {
 	//
 	// GET /infrastructure/radius
 	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
+	// UserLogin implements userLogin operation.
+	//
+	// Authenticate the user using email and password.
+	//
+	// POST /profile/login
+	UserLogin(ctx context.Context, req *UserLoginReq) (UserLoginRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

@@ -134,6 +134,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				}
 
+			case 'p': // Prefix: "profile/login"
+
+				if l := len("profile/login"); len(elem) >= l && elem[0:l] == "profile/login" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleUserLoginRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
 			case 'r': // Prefix: "routes/build/points"
 
 				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
@@ -152,6 +172,80 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					return
+				}
+
+			case 's': // Prefix: "selection/"
+
+				if l := len("selection/"); len(elem) >= l && elem[0:l] == "selection/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'd': // Prefix: "delete"
+
+					if l := len("delete"); len(elem) >= l && elem[0:l] == "delete" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleDeleteSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+				case 'f': // Prefix: "favorite"
+
+					if l := len("favorite"); len(elem) >= l && elem[0:l] == "favorite" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleAddToFavoriteSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+				case 's': // Prefix: "save"
+
+					if l := len("save"); len(elem) >= l && elem[0:l] == "save" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleCreateSelectionRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
 				}
 
 			}
@@ -334,6 +428,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 				}
 
+			case 'p': // Prefix: "profile/login"
+
+				if l := len("profile/login"); len(elem) >= l && elem[0:l] == "profile/login" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "POST":
+						r.name = UserLoginOperation
+						r.summary = "User login"
+						r.operationID = "userLogin"
+						r.pathPattern = "/profile/login"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
 			case 'r': // Prefix: "routes/build/points"
 
 				if l := len("routes/build/points"); len(elem) >= l && elem[0:l] == "routes/build/points" {
@@ -356,6 +474,92 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					default:
 						return
 					}
+				}
+
+			case 's': // Prefix: "selection/"
+
+				if l := len("selection/"); len(elem) >= l && elem[0:l] == "selection/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'd': // Prefix: "delete"
+
+					if l := len("delete"); len(elem) >= l && elem[0:l] == "delete" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = DeleteSelectionOperation
+							r.summary = "Delete a selection"
+							r.operationID = "deleteSelection"
+							r.pathPattern = "/selection/delete"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+				case 'f': // Prefix: "favorite"
+
+					if l := len("favorite"); len(elem) >= l && elem[0:l] == "favorite" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = AddToFavoriteSelectionOperation
+							r.summary = "Add/remove a development to/from favorites"
+							r.operationID = "addToFavoriteSelection"
+							r.pathPattern = "/selection/favorite"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+				case 's': // Prefix: "save"
+
+					if l := len("save"); len(elem) >= l && elem[0:l] == "save" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = CreateSelectionOperation
+							r.summary = "Create a new selection"
+							r.operationID = "createSelection"
+							r.pathPattern = "/selection/save"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
 				}
 
 			}

@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	pgUrl    string
-	httpPort string
+	pgUrl        string
+	httpPort     string
+	jwtSecretKey string
 }
 
 func MustNewConfigWithEnv() *Config {
@@ -17,8 +18,9 @@ func MustNewConfigWithEnv() *Config {
 		panic(fmt.Errorf("error loading .env file: %s", err))
 	}
 	return &Config{
-		pgUrl:    mustGetEnv("PG_URL"),
-		httpPort: mustGetEnv("HTTP_PORT"),
+		pgUrl:        mustGetEnv("PG_URL"),
+		httpPort:     mustGetEnv("HTTP_PORT"),
+		jwtSecretKey: mustGetEnv("JWT_SECRET_KEY"),
 	}
 }
 
@@ -28,6 +30,10 @@ func (c *Config) PgUrl() string {
 
 func (c *Config) HttpPort() string {
 	return c.httpPort
+}
+
+func (c *Config) JwtSecretKey() string {
+	return c.jwtSecretKey
 }
 
 func mustGetEnv(key string) string {

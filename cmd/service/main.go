@@ -4,6 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/yasonofriychuk/real-estate-insight/internal/api/infrastructure_heatmap"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/profile_login"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_delete"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_favorite"
+	"github.com/yasonofriychuk/real-estate-insight/internal/api/selection_save"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/auth"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/persistence/profile"
 	"log/slog"
 	"net/http"
 	"os"
@@ -30,6 +36,8 @@ func main() {
 	rb := route_builder.NewRouteBuilder()
 	cfg := config.MustNewConfigWithEnv()
 
+	jwtService := auth.NewJwtService(cfg.JwtSecretKey())
+
 	pg, err := postgres.New(cfg.PgUrl())
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("failed to connect to postgres")
@@ -39,12 +47,17 @@ func main() {
 	developmentStorage := development.New(pg.Pool)
 	infrastructureStorage := infrastructure.New(pg.Pool)
 	coordinatesStorage := coordinates.New(pg.Pool)
+	profileStorage := profile.New(pg.Pool)
 
 	srv := serviceapi.API{
 		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
 		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage),
 		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
 		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage),
+		ProfileLoginHandler:              profile_login.New(log, jwtService, profileStorage),
+		SelectionDeleteHandler:           selection_delete.New(log),
+		SelectionFavoriteHandler:         selection_favorite.New(log),
+		SelectionSaveHandler:             selection_save.New(log),
 	}
 
 	server, err := api.NewServer(srv)
@@ -59,7 +72,7 @@ func main() {
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
-	}).Handler(server)
+	}).Handler(auth.MustNewMiddleware(server, jwtService, api.UserLoginOperation))
 
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", corsHandler))

@@ -13,11 +13,3 @@ func (s *DevelopmentSearchReqPagination) setDefaults() {
 		s.PerPage = val
 	}
 }
-
-// setDefaults set default value of fields.
-func (s *GenerateInfrastructureHeatmapReq) setDefaults() {
-	{
-		val := int(500)
-		s.CellSize.SetTo(val)
-	}
-}

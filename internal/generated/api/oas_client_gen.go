@@ -28,12 +28,30 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
+	// AddToFavoriteSelection invokes addToFavoriteSelection operation.
+	//
+	// Add or remove a development to/from the selected user's favorite selection.
+	//
+	// POST /selection/favorite
+	AddToFavoriteSelection(ctx context.Context, request *AddToFavoriteSelectionReq) (AddToFavoriteSelectionRes, error)
 	// BuildRoutesByPoints invokes buildRoutesByPoints operation.
 	//
 	// Build a route between points.
 	//
 	// GET /routes/build/points
 	BuildRoutesByPoints(ctx context.Context, params BuildRoutesByPointsParams) (BuildRoutesByPointsRes, error)
+	// CreateSelection invokes createSelection operation.
+	//
+	// Create a new selection for the user with name, comment, and form.
+	//
+	// POST /selection/save
+	CreateSelection(ctx context.Context, request *CreateSelectionReq) (CreateSelectionRes, error)
+	// DeleteSelection invokes deleteSelection operation.
+	//
+	// Delete a selection for the user by selection ID.
+	//
+	// POST /selection/delete
+	DeleteSelection(ctx context.Context, params DeleteSelectionParams) (DeleteSelectionRes, error)
 	// DevelopmentSearch invokes developmentSearch operation.
 	//
 	// POST /developments/search/filter
@@ -51,6 +69,12 @@ type Invoker interface {
 	//
 	// GET /infrastructure/radius
 	InfrastructureRadiusBoard(ctx context.Context, params InfrastructureRadiusBoardParams) (InfrastructureRadiusBoardRes, error)
+	// UserLogin invokes userLogin operation.
+	//
+	// Authenticate the user using email and password.
+	//
+	// POST /profile/login
+	UserLogin(ctx context.Context, request *UserLoginReq) (UserLoginRes, error)
 }
 
 // Client implements OAS client.
@@ -94,6 +118,81 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 		return c.serverURL
 	}
 	return u
+}
+
+// AddToFavoriteSelection invokes addToFavoriteSelection operation.
+//
+// Add or remove a development to/from the selected user's favorite selection.
+//
+// POST /selection/favorite
+func (c *Client) AddToFavoriteSelection(ctx context.Context, request *AddToFavoriteSelectionReq) (AddToFavoriteSelectionRes, error) {
+	res, err := c.sendAddToFavoriteSelection(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendAddToFavoriteSelection(ctx context.Context, request *AddToFavoriteSelectionReq) (res AddToFavoriteSelectionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("addToFavoriteSelection"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/selection/favorite"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, AddToFavoriteSelectionOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/selection/favorite"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAddToFavoriteSelectionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAddToFavoriteSelectionResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
 }
 
 // BuildRoutesByPoints invokes buildRoutesByPoints operation.
@@ -193,6 +292,171 @@ func (c *Client) sendBuildRoutesByPoints(ctx context.Context, params BuildRoutes
 
 	stage = "DecodeResponse"
 	result, err := decodeBuildRoutesByPointsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CreateSelection invokes createSelection operation.
+//
+// Create a new selection for the user with name, comment, and form.
+//
+// POST /selection/save
+func (c *Client) CreateSelection(ctx context.Context, request *CreateSelectionReq) (CreateSelectionRes, error) {
+	res, err := c.sendCreateSelection(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendCreateSelection(ctx context.Context, request *CreateSelectionReq) (res CreateSelectionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("createSelection"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/selection/save"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, CreateSelectionOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/selection/save"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCreateSelectionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCreateSelectionResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeleteSelection invokes deleteSelection operation.
+//
+// Delete a selection for the user by selection ID.
+//
+// POST /selection/delete
+func (c *Client) DeleteSelection(ctx context.Context, params DeleteSelectionParams) (DeleteSelectionRes, error) {
+	res, err := c.sendDeleteSelection(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeleteSelection(ctx context.Context, params DeleteSelectionParams) (res DeleteSelectionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("deleteSelection"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/selection/delete"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, DeleteSelectionOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/selection/delete"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeleteSelectionResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -446,6 +710,81 @@ func (c *Client) sendInfrastructureRadiusBoard(ctx context.Context, params Infra
 
 	stage = "DecodeResponse"
 	result, err := decodeInfrastructureRadiusBoardResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UserLogin invokes userLogin operation.
+//
+// Authenticate the user using email and password.
+//
+// POST /profile/login
+func (c *Client) UserLogin(ctx context.Context, request *UserLoginReq) (UserLoginRes, error) {
+	res, err := c.sendUserLogin(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendUserLogin(ctx context.Context, request *UserLoginReq) (res UserLoginRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("userLogin"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/profile/login"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, UserLoginOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/profile/login"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUserLoginRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUserLoginResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
