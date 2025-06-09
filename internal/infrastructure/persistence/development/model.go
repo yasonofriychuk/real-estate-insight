@@ -40,6 +40,21 @@ type Meta struct {
 	AvitoUrl    string `json:"avito_url"`
 	GisUrl      string `json:"2gis_url"`
 	Address     string `json:"address"`
+	Stats       Stats  `json:"stats"`
+}
+
+type Stats struct {
+	Object3000MCounts POI `json:"object3000mCounts"`
+	Distance          POI `json:"distance"`
+}
+
+type POI struct {
+	Kindergarten int64 `json:"kindergarten"`
+	School       int64 `json:"school"`
+	Hospital     int64 `json:"hospital"`
+	Shops        int64 `json:"shops"`
+	Sport        int64 `json:"sport"`
+	BusStop      int64 `json:"bus_stop"`
 }
 
 func (m *Meta) Scan(value interface{}) error {
