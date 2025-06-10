@@ -690,12 +690,23 @@ func (s *GenerateInfrastructureHeatmapOKItemGeometry) init() GenerateInfrastruct
 }
 
 type GenerateInfrastructureHeatmapReq struct {
-	Bbox GenerateInfrastructureHeatmapReqBbox `json:"bbox"`
+	SelectionId OptUUID                              `json:"selectionId"`
+	Bbox        GenerateInfrastructureHeatmapReqBbox `json:"bbox"`
+}
+
+// GetSelectionId returns the value of SelectionId.
+func (s *GenerateInfrastructureHeatmapReq) GetSelectionId() OptUUID {
+	return s.SelectionId
 }
 
 // GetBbox returns the value of Bbox.
 func (s *GenerateInfrastructureHeatmapReq) GetBbox() GenerateInfrastructureHeatmapReqBbox {
 	return s.Bbox
+}
+
+// SetSelectionId sets the value of SelectionId.
+func (s *GenerateInfrastructureHeatmapReq) SetSelectionId(val OptUUID) {
+	s.SelectionId = val
 }
 
 // SetBbox sets the value of Bbox.
@@ -1029,6 +1040,76 @@ func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
 	return d
 }
 
+// Ref: #/components/schemas/poiStats
+type PoiStats struct {
+	Kindergarten int `json:"kindergarten"`
+	School       int `json:"school"`
+	Hospital     int `json:"hospital"`
+	Shops        int `json:"shops"`
+	Sport        int `json:"sport"`
+	BusStop      int `json:"busStop"`
+}
+
+// GetKindergarten returns the value of Kindergarten.
+func (s *PoiStats) GetKindergarten() int {
+	return s.Kindergarten
+}
+
+// GetSchool returns the value of School.
+func (s *PoiStats) GetSchool() int {
+	return s.School
+}
+
+// GetHospital returns the value of Hospital.
+func (s *PoiStats) GetHospital() int {
+	return s.Hospital
+}
+
+// GetShops returns the value of Shops.
+func (s *PoiStats) GetShops() int {
+	return s.Shops
+}
+
+// GetSport returns the value of Sport.
+func (s *PoiStats) GetSport() int {
+	return s.Sport
+}
+
+// GetBusStop returns the value of BusStop.
+func (s *PoiStats) GetBusStop() int {
+	return s.BusStop
+}
+
+// SetKindergarten sets the value of Kindergarten.
+func (s *PoiStats) SetKindergarten(val int) {
+	s.Kindergarten = val
+}
+
+// SetSchool sets the value of School.
+func (s *PoiStats) SetSchool(val int) {
+	s.School = val
+}
+
+// SetHospital sets the value of Hospital.
+func (s *PoiStats) SetHospital(val int) {
+	s.Hospital = val
+}
+
+// SetShops sets the value of Shops.
+func (s *PoiStats) SetShops(val int) {
+	s.Shops = val
+}
+
+// SetSport sets the value of Sport.
+func (s *PoiStats) SetSport(val int) {
+	s.Sport = val
+}
+
+// SetBusStop sets the value of BusStop.
+func (s *PoiStats) SetBusStop(val int) {
+	s.BusStop = val
+}
+
 // Ref: #/components/schemas/selection
 type Selection struct {
 	SelectionId uuid.UUID     `json:"selectionId"`
@@ -1139,9 +1220,13 @@ func (s *SelectionByIdOK) SetFavoriteDevelopments(val []SelectionByIdOKFavoriteD
 func (*SelectionByIdOK) selectionByIdRes() {}
 
 type SelectionByIdOKFavoriteDevelopmentsItem struct {
-	Development       Development                                              `json:"development"`
-	Object3000mCounts SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts `json:"object3000mCounts"`
-	Distance          SelectionByIdOKFavoriteDevelopmentsItemDistance          `json:"distance"`
+	Development       Development `json:"development"`
+	Object1000mCounts PoiStats    `json:"object1000mCounts"`
+	Object2000mCounts PoiStats    `json:"object2000mCounts"`
+	Object3000mCounts PoiStats    `json:"object3000mCounts"`
+	Object4000mCounts PoiStats    `json:"object4000mCounts"`
+	Object5000mCounts PoiStats    `json:"object5000mCounts"`
+	Distance          PoiStats    `json:"distance"`
 }
 
 // GetDevelopment returns the value of Development.
@@ -1149,13 +1234,33 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetDevelopment() Development {
 	return s.Development
 }
 
+// GetObject1000mCounts returns the value of Object1000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject1000mCounts() PoiStats {
+	return s.Object1000mCounts
+}
+
+// GetObject2000mCounts returns the value of Object2000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject2000mCounts() PoiStats {
+	return s.Object2000mCounts
+}
+
 // GetObject3000mCounts returns the value of Object3000mCounts.
-func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject3000mCounts() SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts {
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject3000mCounts() PoiStats {
 	return s.Object3000mCounts
 }
 
+// GetObject4000mCounts returns the value of Object4000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject4000mCounts() PoiStats {
+	return s.Object4000mCounts
+}
+
+// GetObject5000mCounts returns the value of Object5000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetObject5000mCounts() PoiStats {
+	return s.Object5000mCounts
+}
+
 // GetDistance returns the value of Distance.
-func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetDistance() SelectionByIdOKFavoriteDevelopmentsItemDistance {
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) GetDistance() PoiStats {
 	return s.Distance
 }
 
@@ -1164,152 +1269,34 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetDevelopment(val Development
 	s.Development = val
 }
 
+// SetObject1000mCounts sets the value of Object1000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject1000mCounts(val PoiStats) {
+	s.Object1000mCounts = val
+}
+
+// SetObject2000mCounts sets the value of Object2000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject2000mCounts(val PoiStats) {
+	s.Object2000mCounts = val
+}
+
 // SetObject3000mCounts sets the value of Object3000mCounts.
-func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject3000mCounts(val SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) {
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject3000mCounts(val PoiStats) {
 	s.Object3000mCounts = val
 }
 
+// SetObject4000mCounts sets the value of Object4000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject4000mCounts(val PoiStats) {
+	s.Object4000mCounts = val
+}
+
+// SetObject5000mCounts sets the value of Object5000mCounts.
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetObject5000mCounts(val PoiStats) {
+	s.Object5000mCounts = val
+}
+
 // SetDistance sets the value of Distance.
-func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetDistance(val SelectionByIdOKFavoriteDevelopmentsItemDistance) {
+func (s *SelectionByIdOKFavoriteDevelopmentsItem) SetDistance(val PoiStats) {
 	s.Distance = val
-}
-
-type SelectionByIdOKFavoriteDevelopmentsItemDistance struct {
-	Kindergarten int `json:"kindergarten"`
-	School       int `json:"school"`
-	Hospital     int `json:"hospital"`
-	Shops        int `json:"shops"`
-	Sport        int `json:"sport"`
-	BusStop      int `json:"busStop"`
-}
-
-// GetKindergarten returns the value of Kindergarten.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetKindergarten() int {
-	return s.Kindergarten
-}
-
-// GetSchool returns the value of School.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetSchool() int {
-	return s.School
-}
-
-// GetHospital returns the value of Hospital.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetHospital() int {
-	return s.Hospital
-}
-
-// GetShops returns the value of Shops.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetShops() int {
-	return s.Shops
-}
-
-// GetSport returns the value of Sport.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetSport() int {
-	return s.Sport
-}
-
-// GetBusStop returns the value of BusStop.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) GetBusStop() int {
-	return s.BusStop
-}
-
-// SetKindergarten sets the value of Kindergarten.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetKindergarten(val int) {
-	s.Kindergarten = val
-}
-
-// SetSchool sets the value of School.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetSchool(val int) {
-	s.School = val
-}
-
-// SetHospital sets the value of Hospital.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetHospital(val int) {
-	s.Hospital = val
-}
-
-// SetShops sets the value of Shops.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetShops(val int) {
-	s.Shops = val
-}
-
-// SetSport sets the value of Sport.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetSport(val int) {
-	s.Sport = val
-}
-
-// SetBusStop sets the value of BusStop.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) SetBusStop(val int) {
-	s.BusStop = val
-}
-
-type SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts struct {
-	Kindergarten int `json:"kindergarten"`
-	School       int `json:"school"`
-	Hospital     int `json:"hospital"`
-	Shops        int `json:"shops"`
-	Sport        int `json:"sport"`
-	BusStop      int `json:"busStop"`
-}
-
-// GetKindergarten returns the value of Kindergarten.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetKindergarten() int {
-	return s.Kindergarten
-}
-
-// GetSchool returns the value of School.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetSchool() int {
-	return s.School
-}
-
-// GetHospital returns the value of Hospital.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetHospital() int {
-	return s.Hospital
-}
-
-// GetShops returns the value of Shops.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetShops() int {
-	return s.Shops
-}
-
-// GetSport returns the value of Sport.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetSport() int {
-	return s.Sport
-}
-
-// GetBusStop returns the value of BusStop.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) GetBusStop() int {
-	return s.BusStop
-}
-
-// SetKindergarten sets the value of Kindergarten.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetKindergarten(val int) {
-	s.Kindergarten = val
-}
-
-// SetSchool sets the value of School.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetSchool(val int) {
-	s.School = val
-}
-
-// SetHospital sets the value of Hospital.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetHospital(val int) {
-	s.Hospital = val
-}
-
-// SetShops sets the value of Shops.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetShops(val int) {
-	s.Shops = val
-}
-
-// SetSport sets the value of Sport.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetSport(val int) {
-	s.Sport = val
-}
-
-// SetBusStop sets the value of BusStop.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) SetBusStop(val int) {
-	s.BusStop = val
 }
 
 type SelectionByIdUnauthorized Error

@@ -37,7 +37,7 @@ func main() {
 	}
 
 	for _, dev := range devs {
-		nearestInfrastructure, err := infrastructureStorage.NearestInfrastructure(ctx, dev.Coordinates.Point)
+		nearestInfrastructure, err := infrastructureStorage.NearestInfrastructure(ctx, dev.Coordinates.Point, 5)
 		if err != nil {
 			log.WithContext(ctx).WithError(err).Error("failed to nearest infrastructure")
 			continue
@@ -65,26 +65,7 @@ func main() {
 			}
 		}
 
-		radiusInfrastructure, err := infrastructureStorage.InfrastructureRadiusBoard(ctx, int(dev.ID), 3000)
-		if err != nil {
-			log.WithContext(ctx).WithError(err).Error("failed to infrastructure radius board")
-			continue
-		}
-
-		radiusInfrastructureStats := make(map[osm.ObjType]int64, 6)
-		for _, infraObj := range radiusInfrastructure {
-			radiusInfrastructureStats[infraObj.Type]++
-		}
-
-		err = developmentStorage.UpdateDevelopmentStats(ctx, dev.ID, development.Stats{
-			Object3000MCounts: development.POI{
-				Kindergarten: radiusInfrastructureStats[osm.Kindergarten],
-				School:       radiusInfrastructureStats[osm.School],
-				Hospital:     radiusInfrastructureStats[osm.Hospital],
-				Shops:        radiusInfrastructureStats[osm.Shops],
-				Sport:        radiusInfrastructureStats[osm.Sport],
-				BusStop:      radiusInfrastructureStats[osm.BusStop],
-			},
+		stats := development.Stats{
 			Distance: development.POI{
 				Kindergarten: int64(nearestInfrastructureStats[osm.Kindergarten]),
 				School:       int64(nearestInfrastructureStats[osm.School]),
@@ -93,7 +74,37 @@ func main() {
 				Sport:        int64(nearestInfrastructureStats[osm.Sport]),
 				BusStop:      int64(nearestInfrastructureStats[osm.BusStop]),
 			},
-		})
+		}
+
+		for r, poiPtr := range map[int]*development.POI{
+			1000: &stats.Object1000MCounts,
+			2000: &stats.Object2000MCounts,
+			3000: &stats.Object3000MCounts,
+			4000: &stats.Object4000MCounts,
+			5000: &stats.Object5000MCounts,
+		} {
+			radiusInfrastructure, err := infrastructureStorage.InfrastructureRadiusBoard(ctx, int(dev.ID), r)
+			if err != nil {
+				log.WithContext(ctx).WithError(err).Error("failed to infrastructure radius board")
+				continue
+			}
+
+			radiusInfrastructureStats := make(map[osm.ObjType]int64, 6)
+			for _, infraObj := range radiusInfrastructure {
+				radiusInfrastructureStats[infraObj.Type]++
+			}
+
+			*poiPtr = development.POI{
+				Kindergarten: radiusInfrastructureStats[osm.Kindergarten],
+				School:       radiusInfrastructureStats[osm.School],
+				Hospital:     radiusInfrastructureStats[osm.Hospital],
+				Shops:        radiusInfrastructureStats[osm.Shops],
+				Sport:        radiusInfrastructureStats[osm.Sport],
+				BusStop:      radiusInfrastructureStats[osm.BusStop],
+			}
+		}
+
+		err = developmentStorage.UpdateDevelopmentStats(ctx, dev.ID, stats)
 		if err != nil {
 			log.WithContext(ctx).WithError(err).WithFields(map[string]any{
 				"devId": dev.ID,

@@ -86,6 +86,9 @@ paths:
               required:
                 - bbox
               properties:
+                selectionId:
+                  type: string
+                  format: uuid
                 bbox:
                   type: object
                   required:
@@ -622,55 +625,27 @@ paths:
                       type: object
                       required:
                         - development
+                        - object1000mCounts
+                        - object2000mCounts
                         - object3000mCounts
+                        - object4000mCounts
+                        - object5000mCounts
                         - distance
                       properties:
                         development:
                           $ref: "#/components/schemas/development"
+                        object1000mCounts:
+                          $ref: "#/components/schemas/poiStats"
+                        object2000mCounts:
+                          $ref: "#/components/schemas/poiStats"
                         object3000mCounts:
-                          type: object
-                          required:
-                            - kindergarten
-                            - school
-                            - hospital
-                            - shops
-                            - sport
-                            - busStop
-                          properties:
-                            kindergarten:
-                              type: integer
-                            school:
-                              type: integer
-                            hospital:
-                              type: integer
-                            shops:
-                              type: integer
-                            sport:
-                              type: integer
-                            busStop:
-                              type: integer
+                          $ref: "#/components/schemas/poiStats"
+                        object4000mCounts:
+                          $ref: "#/components/schemas/poiStats"
+                        object5000mCounts:
+                          $ref: "#/components/schemas/poiStats"
                         distance:
-                          type: object
-                          required:
-                            - kindergarten
-                            - school
-                            - hospital
-                            - shops
-                            - sport
-                            - busStop
-                          properties:
-                            kindergarten:
-                              type: integer
-                            school:
-                              type: integer
-                            hospital:
-                              type: integer
-                            shops:
-                              type: integer
-                            sport:
-                              type: integer
-                            busStop:
-                              type: integer
+                          $ref: "#/components/schemas/poiStats"
         400:
           description: Bad request
           content:
@@ -800,6 +775,28 @@ components:
           format: date-time
         form:
           $ref: "#/components/schemas/selectionForm"
+    poiStats:
+      type: object
+      required:
+        - kindergarten
+        - school
+        - hospital
+        - shops
+        - sport
+        - busStop
+      properties:
+        kindergarten:
+          type: integer
+        school:
+          type: integer
+        hospital:
+          type: integer
+        shops:
+          type: integer
+        sport:
+          type: integer
+        busStop:
+          type: integer
     error:
       type: object
       required:

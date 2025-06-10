@@ -7,7 +7,7 @@ import (
 	"github.com/yasonofriychuk/real-estate-insight/internal/osm"
 )
 
-func (s *Storage) NearestInfrastructure(ctx context.Context, point orb.Point) (map[osm.ObjType][]Obj, error) {
+func (s *Storage) NearestInfrastructure(ctx context.Context, point orb.Point, count int) (map[osm.ObjType][]Obj, error) {
 	const query = `
 		WITH RankedObjects AS (
 			SELECT
@@ -48,12 +48,12 @@ func (s *Storage) NearestInfrastructure(ctx context.Context, point orb.Point) (m
 		FROM
 			RankedObjects
 		WHERE
-			rn <= 3
+			rn <= $3
 		ORDER BY
 			object_type, rn;
 	`
 
-	rows, err := s.pg.Query(ctx, query, point.Lon(), point.Lat())
+	rows, err := s.pg.Query(ctx, query, point.Lon(), point.Lat(), count)
 	if err != nil {
 		return nil, fmt.Errorf("query nearest infrastructure: %w", err)
 	}

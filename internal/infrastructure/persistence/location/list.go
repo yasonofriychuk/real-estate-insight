@@ -10,7 +10,9 @@ func (s *Storage) CityList(ctx context.Context) ([]Location, error) {
 		SELECT 
 		    id, name
 		FROM location 
-		WHERE loc_type = 'city'
+		WHERE 
+		    loc_type = 'city' AND 
+		    id IN (SELECT DISTINCT location_id FROM development)
 	`
 
 	rows, err := s.pg.Query(ctx, query)

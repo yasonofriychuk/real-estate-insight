@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/paulmach/orb"
+	"github.com/yasonofriychuk/real-estate-insight/internal/infrastructure/auth"
 	"math"
 	"net/http"
 
@@ -15,14 +16,16 @@ import (
 )
 
 type HeatmapHandler struct {
-	log     logger.Log
-	storage storage
+	log              logger.Log
+	storage          infrastructureStorage
+	selectionStorage selectionStorage
 }
 
-func New(log logger.Log, storage storage) *HeatmapHandler {
+func New(log logger.Log, storage infrastructureStorage, selectionStorage selectionStorage) *HeatmapHandler {
 	return &HeatmapHandler{
-		log:     log,
-		storage: storage,
+		log:              log,
+		storage:          storage,
+		selectionStorage: selectionStorage,
 	}
 }
 
@@ -30,6 +33,39 @@ func (h *HeatmapHandler) GenerateInfrastructureHeatmap(
 	ctx context.Context,
 	request *api.GenerateInfrastructureHeatmapReq,
 ) (api.GenerateInfrastructureHeatmapRes, error) {
+	weights := infrastructure.HeatmapParamsWeights{
+		Hospital:     1,
+		Sport:        1,
+		Shops:        1,
+		Kindergarten: 1,
+		BusStop:      1,
+		School:       1,
+	}
+
+	if request.SelectionId.Set {
+		selection, err := h.selectionStorage.GetById(ctx, request.SelectionId.Value, pointer.Get(auth.ProfileIdFromCtx(ctx)))
+		if err != nil {
+			h.log.WithContext(ctx).WithError(err).WithFields(map[string]any{
+				"selection_id": request.SelectionId.Value,
+				"profile_id":   pointer.Get(auth.ProfileIdFromCtx(ctx)),
+			}).Error("failed get selection by id")
+
+			return pointer.To(api.GenerateInfrastructureHeatmapInternalServerError(
+				errors.BuildError(http.StatusInternalServerError, "internal error"),
+			)), nil
+		}
+		if selection != nil {
+			weights = infrastructure.HeatmapParamsWeights{
+				Hospital:     selection.Form.WHospital,
+				Sport:        selection.Form.WSport,
+				Shops:        selection.Form.WShop,
+				Kindergarten: selection.Form.WKindergarten,
+				BusStop:      selection.Form.WBusStop,
+				School:       selection.Form.WSchool,
+			}
+		}
+	}
+
 	topLeft := orb.Point{request.Bbox.TopLeftLon, request.Bbox.TopLeftLat}
 	bottomRight := orb.Point{request.Bbox.BottomRightLon, request.Bbox.BottomRightLat}
 
@@ -49,14 +85,7 @@ func (h *HeatmapHandler) GenerateInfrastructureHeatmap(
 			BottomRightLon: request.Bbox.BottomRightLon,
 			BottomRightLat: request.Bbox.BottomRightLat,
 		},
-		Weights: infrastructure.HeatmapParamsWeights{
-			Hospital:     10,
-			Sport:        10,
-			Shops:        10,
-			Kindergarten: 10,
-			BusStop:      10,
-			School:       10,
-		},
+		Weights:  weights,
 		CellSize: int(max((widthMeters/15)-float64(int64(widthMeters/15)%100), 50)),
 	}
 

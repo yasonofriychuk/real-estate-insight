@@ -44,7 +44,11 @@ type Meta struct {
 }
 
 type Stats struct {
+	Object1000MCounts POI `json:"object1000mCounts"`
+	Object2000MCounts POI `json:"object2000mCounts"`
 	Object3000MCounts POI `json:"object3000mCounts"`
+	Object4000MCounts POI `json:"object4000mCounts"`
+	Object5000MCounts POI `json:"object5000mCounts"`
 	Distance          POI `json:"distance"`
 }
 

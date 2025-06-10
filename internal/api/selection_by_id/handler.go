@@ -93,23 +93,24 @@ func (h *SelectionByIdHandler) SelectionById(ctx context.Context, params api.Sel
 					Address:     dev.Meta.Address,
 					IsFavorite:  true,
 				},
-				Object3000mCounts: api.SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts{
-					Kindergarten: int(dev.Meta.Stats.Object3000MCounts.Kindergarten),
-					School:       int(dev.Meta.Stats.Object3000MCounts.School),
-					Hospital:     int(dev.Meta.Stats.Object3000MCounts.Hospital),
-					Shops:        int(dev.Meta.Stats.Object3000MCounts.Shops),
-					Sport:        int(dev.Meta.Stats.Object3000MCounts.Sport),
-					BusStop:      int(dev.Meta.Stats.Object3000MCounts.BusStop),
-				},
-				Distance: api.SelectionByIdOKFavoriteDevelopmentsItemDistance{
-					Kindergarten: int(dev.Meta.Stats.Distance.Kindergarten),
-					School:       int(dev.Meta.Stats.Distance.School),
-					Hospital:     int(dev.Meta.Stats.Distance.Hospital),
-					Shops:        int(dev.Meta.Stats.Distance.Shops),
-					Sport:        int(dev.Meta.Stats.Distance.Sport),
-					BusStop:      int(dev.Meta.Stats.Distance.BusStop),
-				},
+				Object1000mCounts: poiStatsConvert(dev.Meta.Stats.Object1000MCounts),
+				Object2000mCounts: poiStatsConvert(dev.Meta.Stats.Object2000MCounts),
+				Object3000mCounts: poiStatsConvert(dev.Meta.Stats.Object3000MCounts),
+				Object4000mCounts: poiStatsConvert(dev.Meta.Stats.Object4000MCounts),
+				Object5000mCounts: poiStatsConvert(dev.Meta.Stats.Object5000MCounts),
+				Distance:          poiStatsConvert(dev.Meta.Stats.Distance),
 			}
 		}),
 	}, nil
+}
+
+func poiStatsConvert(poi development.POI) api.PoiStats {
+	return api.PoiStats{
+		Kindergarten: int(poi.Kindergarten),
+		School:       int(poi.School),
+		Hospital:     int(poi.Hospital),
+		Shops:        int(poi.Shops),
+		Sport:        int(poi.Sport),
+		BusStop:      int(poi.BusStop),
+	}
 }

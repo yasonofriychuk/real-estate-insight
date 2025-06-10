@@ -61,7 +61,7 @@ func main() {
 		BuildRoutesByPointsHandler:       build_routes_by_points.New(log, rb, coordinatesStorage),
 		DevelopmentSearchHandler:         development_search_filter.New(log, developmentStorage, selectionStorage),
 		InfrastructureRadiusBoardHandler: infrastructure_radius_board.New(log, infrastructureStorage),
-		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage),
+		HeatmapHandler:                   infrastructure_heatmap.New(log, infrastructureStorage, selectionStorage),
 		ProfileLoginHandler:              profile_login.New(log, jwtService, profileStorage),
 		SelectionDeleteHandler:           selection_delete.New(log, selectionStorage),
 		SelectionFavoriteHandler:         selection_favorite.New(log, selectionStorage),

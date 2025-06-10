@@ -2918,13 +2918,20 @@ func (s *GenerateInfrastructureHeatmapReq) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *GenerateInfrastructureHeatmapReq) encodeFields(e *jx.Encoder) {
 	{
+		if s.SelectionId.Set {
+			e.FieldStart("selectionId")
+			s.SelectionId.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("bbox")
 		s.Bbox.Encode(e)
 	}
 }
 
-var jsonFieldsNameOfGenerateInfrastructureHeatmapReq = [1]string{
-	0: "bbox",
+var jsonFieldsNameOfGenerateInfrastructureHeatmapReq = [2]string{
+	0: "selectionId",
+	1: "bbox",
 }
 
 // Decode decodes GenerateInfrastructureHeatmapReq from json.
@@ -2936,8 +2943,18 @@ func (s *GenerateInfrastructureHeatmapReq) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "selectionId":
+			if err := func() error {
+				s.SelectionId.Reset()
+				if err := s.SelectionId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"selectionId\"")
+			}
 		case "bbox":
-			requiredBitSet[0] |= 1 << 0
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				if err := s.Bbox.Decode(d); err != nil {
 					return err
@@ -2956,7 +2973,7 @@ func (s *GenerateInfrastructureHeatmapReq) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000001,
+		0b00000010,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4008,6 +4025,187 @@ func (s *OptUUID) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *PoiStats) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PoiStats) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kindergarten")
+		e.Int(s.Kindergarten)
+	}
+	{
+		e.FieldStart("school")
+		e.Int(s.School)
+	}
+	{
+		e.FieldStart("hospital")
+		e.Int(s.Hospital)
+	}
+	{
+		e.FieldStart("shops")
+		e.Int(s.Shops)
+	}
+	{
+		e.FieldStart("sport")
+		e.Int(s.Sport)
+	}
+	{
+		e.FieldStart("busStop")
+		e.Int(s.BusStop)
+	}
+}
+
+var jsonFieldsNameOfPoiStats = [6]string{
+	0: "kindergarten",
+	1: "school",
+	2: "hospital",
+	3: "shops",
+	4: "sport",
+	5: "busStop",
+}
+
+// Decode decodes PoiStats from json.
+func (s *PoiStats) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PoiStats to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kindergarten":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.Kindergarten = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kindergarten\"")
+			}
+		case "school":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.School = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"school\"")
+			}
+		case "hospital":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int()
+				s.Hospital = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hospital\"")
+			}
+		case "shops":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Int()
+				s.Shops = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"shops\"")
+			}
+		case "sport":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Int()
+				s.Sport = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sport\"")
+			}
+		case "busStop":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Int()
+				s.BusStop = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"busStop\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PoiStats")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPoiStats) {
+					name = jsonFieldsNameOfPoiStats[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PoiStats) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PoiStats) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *Selection) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -4435,8 +4633,24 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) encodeFields(e *jx.Encoder) {
 		s.Development.Encode(e)
 	}
 	{
+		e.FieldStart("object1000mCounts")
+		s.Object1000mCounts.Encode(e)
+	}
+	{
+		e.FieldStart("object2000mCounts")
+		s.Object2000mCounts.Encode(e)
+	}
+	{
 		e.FieldStart("object3000mCounts")
 		s.Object3000mCounts.Encode(e)
+	}
+	{
+		e.FieldStart("object4000mCounts")
+		s.Object4000mCounts.Encode(e)
+	}
+	{
+		e.FieldStart("object5000mCounts")
+		s.Object5000mCounts.Encode(e)
 	}
 	{
 		e.FieldStart("distance")
@@ -4444,10 +4658,14 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItem = [3]string{
+var jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItem = [7]string{
 	0: "development",
-	1: "object3000mCounts",
-	2: "distance",
+	1: "object1000mCounts",
+	2: "object2000mCounts",
+	3: "object3000mCounts",
+	4: "object4000mCounts",
+	5: "object5000mCounts",
+	6: "distance",
 }
 
 // Decode decodes SelectionByIdOKFavoriteDevelopmentsItem from json.
@@ -4469,8 +4687,28 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"development\"")
 			}
-		case "object3000mCounts":
+		case "object1000mCounts":
 			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Object1000mCounts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"object1000mCounts\"")
+			}
+		case "object2000mCounts":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.Object2000mCounts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"object2000mCounts\"")
+			}
+		case "object3000mCounts":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Object3000mCounts.Decode(d); err != nil {
 					return err
@@ -4479,8 +4717,28 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"object3000mCounts\"")
 			}
+		case "object4000mCounts":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				if err := s.Object4000mCounts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"object4000mCounts\"")
+			}
+		case "object5000mCounts":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				if err := s.Object5000mCounts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"object5000mCounts\"")
+			}
 		case "distance":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				if err := s.Distance.Decode(d); err != nil {
 					return err
@@ -4499,7 +4757,7 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000111,
+		0b01111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4541,368 +4799,6 @@ func (s *SelectionByIdOKFavoriteDevelopmentsItem) MarshalJSON() ([]byte, error) 
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *SelectionByIdOKFavoriteDevelopmentsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("kindergarten")
-		e.Int(s.Kindergarten)
-	}
-	{
-		e.FieldStart("school")
-		e.Int(s.School)
-	}
-	{
-		e.FieldStart("hospital")
-		e.Int(s.Hospital)
-	}
-	{
-		e.FieldStart("shops")
-		e.Int(s.Shops)
-	}
-	{
-		e.FieldStart("sport")
-		e.Int(s.Sport)
-	}
-	{
-		e.FieldStart("busStop")
-		e.Int(s.BusStop)
-	}
-}
-
-var jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemDistance = [6]string{
-	0: "kindergarten",
-	1: "school",
-	2: "hospital",
-	3: "shops",
-	4: "sport",
-	5: "busStop",
-}
-
-// Decode decodes SelectionByIdOKFavoriteDevelopmentsItemDistance from json.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SelectionByIdOKFavoriteDevelopmentsItemDistance to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "kindergarten":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.Kindergarten = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"kindergarten\"")
-			}
-		case "school":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Int()
-				s.School = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"school\"")
-			}
-		case "hospital":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int()
-				s.Hospital = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hospital\"")
-			}
-		case "shops":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Int()
-				s.Shops = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"shops\"")
-			}
-		case "sport":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Int()
-				s.Sport = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sport\"")
-			}
-		case "busStop":
-			requiredBitSet[0] |= 1 << 5
-			if err := func() error {
-				v, err := d.Int()
-				s.BusStop = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"busStop\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode SelectionByIdOKFavoriteDevelopmentsItemDistance")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00111111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemDistance) {
-					name = jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemDistance[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemDistance) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("kindergarten")
-		e.Int(s.Kindergarten)
-	}
-	{
-		e.FieldStart("school")
-		e.Int(s.School)
-	}
-	{
-		e.FieldStart("hospital")
-		e.Int(s.Hospital)
-	}
-	{
-		e.FieldStart("shops")
-		e.Int(s.Shops)
-	}
-	{
-		e.FieldStart("sport")
-		e.Int(s.Sport)
-	}
-	{
-		e.FieldStart("busStop")
-		e.Int(s.BusStop)
-	}
-}
-
-var jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts = [6]string{
-	0: "kindergarten",
-	1: "school",
-	2: "hospital",
-	3: "shops",
-	4: "sport",
-	5: "busStop",
-}
-
-// Decode decodes SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts from json.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "kindergarten":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.Kindergarten = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"kindergarten\"")
-			}
-		case "school":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Int()
-				s.School = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"school\"")
-			}
-		case "hospital":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int()
-				s.Hospital = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hospital\"")
-			}
-		case "shops":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Int()
-				s.Shops = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"shops\"")
-			}
-		case "sport":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Int()
-				s.Sport = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sport\"")
-			}
-		case "busStop":
-			requiredBitSet[0] |= 1 << 5
-			if err := func() error {
-				v, err := d.Int()
-				s.BusStop = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"busStop\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00111111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) {
-					name = jsonFieldsNameOfSelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SelectionByIdOKFavoriteDevelopmentsItemObject3000mCounts) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
