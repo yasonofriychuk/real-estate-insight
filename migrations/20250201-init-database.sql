@@ -11,6 +11,16 @@ CREATE TABLE IF NOT EXISTS osm_node (
 
 CREATE INDEX IF NOT EXISTS idx_osm_node_way ON osm_node USING GIST (way);
 
+CREATE TYPE location_type AS ENUM('country', 'city', 'region');
+
+CREATE TABLE IF NOT EXISTS location (
+    id BIGINT PRIMARY KEY,
+    region_id BIGINT references location(id),
+    country_id BIGINT references location(id),
+    name TEXT not null,
+    loc_type location_type not null
+);
+
 CREATE TABLE IF NOT EXISTS development (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -21,16 +31,6 @@ CREATE TABLE IF NOT EXISTS development (
     created_at timestamp default current_timestamp NOT NULL,
     updated_at timestamp default current_timestamp NOT NULL,
     deleted_at timestamp
-);
-
-CREATE TYPE location_type AS ENUM('country', 'city', 'region');
-
-CREATE TABLE IF NOT EXISTS location (
-    id BIGINT PRIMARY KEY,
-    region_id BIGINT references location(id),
-    country_id BIGINT references location(id),
-    name TEXT not null,
-    loc_type location_type not null
 );
 
 CREATE TABLE IF NOT EXISTS profile (
